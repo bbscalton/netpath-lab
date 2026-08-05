@@ -49,6 +49,9 @@ ADVANCED SOC CHECKLIST (may not be separate app toggles)
 • APN / wrong bearer confusion — confirm the phone is on the pack APN under test.
 • IPv6 vs IPv4 asymmetry — app drills are IPv4-focused; enforce the same allowlists on IPv6.
 • Over-broad CDN ASN allowlists — entire hosting/CDN ASNs create unmetered escape hatches.
+• UDP/QUIC gaps — Hysteria/Hysteria2 bypass TCP-only pack filters (method 21 drill).
+• Encapsulated TLS-in-TLS — inner ClientHello inside SSH/VPN tunnel (method 24 drill).
+• Chinese-ecosystem stacks (methods 18–25) — Reality, VMess/VLESS, Shadowsocks, CDN fronting: separate client to operator VPS.
 
 DEFENDER CONTROLS (PRIORITY ORDER)
 1. Pack/zero-rate = destination IP/prefix allowlists (automated, tight).

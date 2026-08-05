@@ -89,9 +89,15 @@
         <li><a href="methods.html#m9">Port fallback hold stack (443→80→8080)</a></li>
         <li><a href="methods.html#m10">www. SNI toggle</a></li>
         <li><a href="methods.html#m11">Custom Setup full hold stack</a></li>
+        <li><a href="methods.html#m13">WebSocket upgrade + TLS SNI</a></li>
+        <li><a href="methods.html#m14">HTTP/2 preface + TLS SNI</a></li>
+        <li><a href="methods.html#m15">Chrome JA3 mimic ClientHello</a></li>
+        <li><a href="methods.html#m16">Trojan HTTP camouflage</a></li>
+        <li><a href="methods.html#m17">Random padding + TLS SNI</a></li>
+        <li><a href="methods.html#advanced-cn">Chinese-ecosystem SOC drills (18–25)</a></li>
         <li><a href="methods.html#scoring">Billing / zero-rate miss drill framing</a></li>
       </ol>
-      <p class="note">Also covered for SOC: APN/bearer confusion, IPv6 vs IPv4 asymmetry, over-broad CDN ASN allowlists — see <a href="methods.html#advanced">advanced checklist</a>.</p>
+      <p class="note">Also covered for SOC: APN/bearer confusion, IPv4 vs IPv6 asymmetry, over-broad CDN ASN allowlists, UDP/QUIC gaps, encapsulated TLS — see <a href="methods.html#advanced">advanced checklist</a> and <a href="methods.html#advanced-cn">Chinese-ecosystem drills (18–25)</a>.</p>
       <a class="btn primary" href="methods.html">Open full method how-tos</a>
     </section>
 
@@ -151,6 +157,8 @@ sudo adduser netpath</code></pre>
       <p>In the app: host = VPS public IP, port = 443, username/password = lab user.</p>
       <p>For <strong>SNI mismatch</strong>: Custom SNI = a pack-like hostname; dial host stays your VPS IP.</p>
       <p>For <strong>full TLS wrap</strong> (method 8): terminate TLS with stunnel/sslh in front of sshd.</p>
+      <p>For <strong>WebSocket / Trojan / HTTP/2 fronts</strong> (methods 13–16): sshd on 443 must accept leading non-SSH bytes before the SSH banner, or use a simple strip-and-forward proxy in the lab.</p>
+      <p>For <strong>doc-only drills 18–25</strong> (Reality, VMess, Shadowsocks, Hysteria, etc.): deploy the matching server on your VPS with Xray/sing-box — not bundled in the APK.</p>
     </section>
 
     <section id="roe" class="panel warn">

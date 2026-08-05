@@ -6,7 +6,15 @@ enum class FrontMode {
     DIRECT,
     HTTP_INJECT,
     TLS_SNI_CLIENTHELLO_ONLY,
-    TLS_SNI_FULL
+    TLS_SNI_FULL,
+    /** WebSocket HTTP upgrade text, then ClientHello-only SNI (VMess/Trojan WS transport analogue). */
+    HTTP_WEBSOCKET_TLS,
+    /** HTTP/2 connection preface (PRI * HTTP/2.0) then ClientHello-only SNI. */
+    HTTP2_PREAMBLE_TLS,
+    /** Chrome-like TLS ClientHello extension order (JA3/JA4 mimic drill). */
+    TLS_CHROME_JA3_MIMIC,
+    /** Trojan-style fake HTTP GET camouflage before SSH bytes. */
+    TROJAN_HTTP_CAMOUFLAGE
 }
 
 /** Path type under Custom Setup (HA Tunnel–style Direct Connection). */
@@ -47,7 +55,11 @@ data class TunnelProfile(
     /** Prefer nearby/low-RTT lab server (hint logged; operator picks host). */
     val preferNearbyServer: Boolean = true,
     /** Request battery unrestricted + avoid spam reconnects while VPN is up. */
-    val keepVpnAlive: Boolean = true
+    val keepVpnAlive: Boolean = true,
+    /** Prepend random zero-byte padding before the TLS/HTTP front (length obfuscation drill). */
+    val useFrontPadding: Boolean = false,
+    /** Upper bound for random padding bytes (0 disables even when useFrontPadding). */
+    val frontPaddingMaxBytes: Int = 64
 ) : Serializable {
     companion object {
         const val DEFAULT_HTTP_PAYLOAD =

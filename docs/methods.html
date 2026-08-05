@@ -38,9 +38,9 @@
     </section>
 
     <section id="scoring" class="panel warn">
-      <h2>12. Billing / zero-rate miss drill (framing)</h2>
+      <h2>26. Billing / zero-rate miss drill (framing)</h2>
       <p>
-        Apply this scoring frame to <em>every</em> method 1–11. You are testing whether pack/zero-rate
+        Apply this scoring frame to <em>every</em> method 1–25. You are testing whether pack/zero-rate
         controls miss real data usage to your VPS.
       </p>
       <ul>
@@ -49,7 +49,7 @@
       </ul>
       <p class="note">Always generate real tunneled traffic — idle TCP alone is a weak billing test.</p>
       <h3>App settings</h3>
-      <p>Select method <em>12. Billing / zero-rate miss drill</em> to apply a SNI-mismatch baseline, then run any method 1–11 on pack SIM.</p>
+      <p>Select method <em>26. Billing / zero-rate miss drill</em> to apply a SNI-mismatch baseline, then run any method 1–25 on pack SIM.</p>
       <h3>Defender fix</h3>
       <p>Destination IP/prefix allowlists on the pack bearer; SNI≠IP mismatch deny/rate; quotas + hosting-ASN scoring.</p>
     </section>
@@ -68,6 +68,12 @@
         <li><a href="#m9">Port fallback hold stack</a></li>
         <li><a href="#m10">www. SNI toggle</a></li>
         <li><a href="#m11">Custom Setup full hold stack</a></li>
+        <li><a href="#m13">WebSocket upgrade + TLS SNI</a></li>
+        <li><a href="#m14">HTTP/2 preface + TLS SNI</a></li>
+        <li><a href="#m15">Chrome JA3 mimic ClientHello</a></li>
+        <li><a href="#m16">Trojan HTTP camouflage</a></li>
+        <li><a href="#m17">Random padding + TLS SNI</a></li>
+        <li><a href="#advanced-cn">Chinese-ecosystem SOC drills (18–25)</a></li>
         <li><a href="#scoring">Billing / zero-rate framing</a></li>
         <li><a href="#advanced">Advanced SOC checklist</a></li>
       </ol>
@@ -286,6 +292,160 @@ sudo ufw allow 443/tcp</code></pre>
       <h3>Defender fix</h3>
       <p>None of these toggles should defeat a destination IP allowlist on the pack bearer.</p>
     </article>
+
+    <article id="m13" class="panel method">
+      <h2>13. WebSocket upgrade + TLS SNI</h2>
+      <p class="wire"><strong>On the wire:</strong> HTTP WebSocket upgrade (<code>Host</code> = pack-like SNI) → TLS ClientHello-only → SSH. Models VMess/Trojan WS+TLS transport.</p>
+      <h3>Exact app settings</h3>
+      <ol class="steps">
+        <li>Host = VPS IP; Port = <code>443</code>.</li>
+        <li>Front = <em>WebSocket upgrade + TLS SNI</em>.</li>
+        <li>Custom SNI = pack-like hostname; Preserve SNI <strong>ON</strong>.</li>
+        <li>Apply method <em>13. WebSocket upgrade + TLS SNI</em> → Connect on pack SIM.</li>
+      </ol>
+      <h3>Lab server</h3>
+      <p>sshd on 443 must tolerate leading HTTP bytes before SSH (same tolerance as method 6).</p>
+      <h3>PASS / FAIL</h3>
+      <p>PASS if dest-IP allowlist still blocks/rates VPS despite WS camouflage. FAIL if unmetered success.</p>
+      <h3>Defender fix</h3>
+      <p>Normalize WS+TLS paths; enforce policy on TCP destination IP, not upgrade Host text alone.</p>
+    </article>
+
+    <article id="m14" class="panel method">
+      <h2>14. HTTP/2 preface + TLS SNI</h2>
+      <p class="wire"><strong>On the wire:</strong> <code>PRI * HTTP/2.0\r\n\r\n\r\n</code> connection preface → ClientHello SNI → SSH.</p>
+      <h3>Exact app settings</h3>
+      <ol class="steps">
+        <li>Host = VPS IP; Port = <code>443</code>.</li>
+        <li>Front = <em>HTTP/2 preface + TLS SNI</em>.</li>
+        <li>Custom SNI = pack-like host; Preserve SNI <strong>ON</strong>.</li>
+        <li>Apply method <em>14. HTTP/2 preface + TLS SNI</em>.</li>
+      </ol>
+      <h3>Lab server</h3>
+      <p>sshd on 443; capture should show h2 magic then TLS record <code>0x16</code>.</p>
+      <h3>PASS / FAIL</h3>
+      <p>h2 preface to a non-CDN VPS must not inherit zero-rate from a pack CDN hostname in SNI.</p>
+      <h3>Defender fix</h3>
+      <p>ALPN/h2 allowlists tied to authorized edge prefixes only; dest IP enforcement primary.</p>
+    </article>
+
+    <article id="m15" class="panel method">
+      <h2>15. Chrome JA3/JA4 mimic ClientHello</h2>
+      <p class="wire"><strong>On the wire:</strong> Static Chrome-like ClientHello (ALPN h2/http/1.1, key_share, extension order) → SSH. uTLS-style drill without third-party deps.</p>
+      <h3>Exact app settings</h3>
+      <ol class="steps">
+        <li>Host = VPS IP; Port = <code>443</code>.</li>
+        <li>Front = <em>Chrome JA3 mimic ClientHello</em>.</li>
+        <li>Custom SNI = pack-like host; Preserve SNI <strong>ON</strong>.</li>
+        <li>Export capture; compare JA3/JA4 to real Chrome baseline in Zeek/Suricata.</li>
+      </ol>
+      <h3>Lab server</h3>
+      <p>sshd on 443 (ClientHello-only path).</p>
+      <h3>PASS / FAIL</h3>
+      <p>Browser-like JA3 must not bypass dest-IP billing. FAIL if zero-rate solely because fingerprint looks like Chrome.</p>
+      <h3>Defender fix</h3>
+      <p>JA3/JA4 is secondary to SNI≠IP + dest IP allowlists; watch post-handshake ticket anomalies for full Reality stacks.</p>
+    </article>
+
+    <article id="m16" class="panel method">
+      <h2>16. Trojan-style HTTP camouflage</h2>
+      <p class="wire"><strong>On the wire:</strong> 56-byte hex token + CRLF + fake HTTP <code>GET</code> (Host = pack-like) → SSH. Trojan wire-pattern drill only — no Trojan server in app.</p>
+      <h3>Exact app settings</h3>
+      <ol class="steps">
+        <li>Host = VPS IP; Port = <code>443</code>.</li>
+        <li>Front = <em>Trojan HTTP camouflage</em>.</li>
+        <li>Custom SNI fills <code>Host</code> in the fake GET.</li>
+        <li>Apply method <em>16. Trojan-style HTTP camouflage</em>.</li>
+      </ol>
+      <h3>Lab server</h3>
+      <p>sshd or a strip-and-forward proxy that accepts non-SSH leading bytes before SSH banner.</p>
+      <h3>PASS / FAIL</h3>
+      <p>PASS if VPS dest is blocked/rated despite trojan-like opening bytes.</p>
+      <h3>Defender fix</h3>
+      <p>Active probe + dest IP policy; do not zero-rate based on HTTP appearance alone.</p>
+    </article>
+
+    <article id="m17" class="panel method">
+      <h2>17. Random padding + TLS SNI</h2>
+      <p class="wire"><strong>On the wire:</strong> Random-length zero-byte padding → ClientHello SNI → SSH. Length obfuscation analogue for Shadowsocks/VMess padding.</p>
+      <h3>Exact app settings</h3>
+      <ol class="steps">
+        <li>Host = VPS IP; Port = <code>443</code>.</li>
+        <li>Front = Custom SNI (SSL/TLS Mode); Preserve SNI <strong>ON</strong>.</li>
+        <li>Apply method <em>17. Random padding + TLS SNI</em> — enables front padding automatically.</li>
+        <li>Session log should show padding byte count before ClientHello.</li>
+      </ol>
+      <h3>Lab server</h3>
+      <p>sshd on 443.</p>
+      <h3>PASS / FAIL</h3>
+      <p>Padding cosmetics must not bypass IP allowlists.</p>
+      <h3>Defender fix</h3>
+      <p>Dest IP first; burst-size heuristics are defense-in-depth only.</p>
+    </article>
+
+    <section id="advanced-cn" class="panel">
+      <h2>Chinese-ecosystem SOC drills (18–25) — document / separate client</h2>
+      <p>These methods are catalogued in-app with PASS/FAIL framing and checklist steps. Full protocol stacks require operator-deployed servers (Xray, sing-box, Shadowsocks, Hysteria) — <strong>not bundled</strong> in NetPath Lab.</p>
+
+      <article class="adv">
+        <h3 id="m18">18. XTLS-Reality / TLS hijack</h3>
+        <p class="wire"><strong>On the wire:</strong> VLESS+Reality with uTLS Chrome profile; ephemeral cert; fallback proxies probes to real cover site (e.g. microsoft.com).</p>
+        <p><strong>Lab setup:</strong> Operator Xray/sing-box Reality inbound on YOUR VPS. Client = sing-box/v2rayN (authorized lab).</p>
+        <p><strong>PASS / FAIL:</strong> Pack must block/charge non-allowlist VPS even when SNI mimics high-traffic domain.</p>
+        <p><strong>Defender:</strong> Encapsulated TLS fingerprinting; JA4; NewSessionTicket behavior; active probe.</p>
+      </article>
+
+      <article class="adv">
+        <h3 id="m19">19. VMess / VLESS + WebSocket + TLS</h3>
+        <p class="wire"><strong>On the wire:</strong> TCP → TLS → WebSocket → VMess/VLESS. Common V2Ray-family stack in circumvention ecosystem.</p>
+        <p><strong>Lab setup:</strong> nginx/caddy WS reverse proxy → Xray inbound on operator VPS.</p>
+        <p><strong>App analogue:</strong> Method 13 models WS upgrade + ClientHello slice only.</p>
+        <p><strong>Defender:</strong> TLS-in-TLS detection; WS path normalization; dest IP allowlists.</p>
+      </article>
+
+      <article class="adv">
+        <h3 id="m20">20. Shadowsocks / plugin obfuscation</h3>
+        <p class="wire"><strong>On the wire:</strong> AEAD Shadowsocks with optional v2ray-plugin, simple-obfs, or TLS disguise.</p>
+        <p><strong>Lab setup:</strong> shadowsocks-libev or sing-box on operator VPS — no public free nodes.</p>
+        <p><strong>App analogue:</strong> Method 17 (padding) only.</p>
+        <p><strong>Defender:</strong> Active probing; entropy/ML classifiers; deny arbitrary hosting ASN on pack.</p>
+      </article>
+
+      <article class="adv">
+        <h3 id="m21">21. Hysteria / QUIC UDP</h3>
+        <p class="wire"><strong>On the wire:</strong> QUIC (UDP) with TLS 1.3 — bypasses TCP-only DPI and many pack filters.</p>
+        <p><strong>Lab setup:</strong> Hysteria2 server on operator VPS; hysteria or sing-box client.</p>
+        <p><strong>PASS / FAIL:</strong> FAIL finding if UDP/QUIC to VPS is unmetered while TCP is blocked.</p>
+        <p><strong>Defender:</strong> QUIC Initial inspection; UDP allowlists identical to TCP policy.</p>
+      </article>
+
+      <article class="adv">
+        <h3 id="m22">22. CDN domain fronting</h3>
+        <p class="wire"><strong>On the wire:</strong> TLS SNI = CDN edge; inner route targets operator origin behind CDN.</p>
+        <p><strong>Lab setup:</strong> Operator-owned CDN zone → origin = VPS.</p>
+        <p><strong>Defender:</strong> Tight per-service CDN prefixes; deny arbitrary customer origins behind CDN SNI.</p>
+      </article>
+
+      <article class="adv">
+        <h3 id="m23">23. Multiplexed streams (MUX)</h3>
+        <p class="wire"><strong>On the wire:</strong> smux/MUX merges inner sessions on one outer TCP — reduces encapsulated-TLS visibility.</p>
+        <p><strong>Defender:</strong> Outer dest IP billing + long-flow quotas; MUX does not fix SNI≠IP gaps.</p>
+      </article>
+
+      <article class="adv">
+        <h3 id="m24">24. Encapsulated TLS-in-TLS fingerprint</h3>
+        <p class="wire"><strong>On the wire:</strong> Inner TLS ClientHello inside outer SSH/VPN tunnel — protocol-agnostic ISP classifier (USENIX 2024).</p>
+        <p><strong>Lab drill:</strong> Browse HTTPS through NetPath VPN; correlate inner TLS with outer VPS flow charging.</p>
+        <p><strong>Defender:</strong> Bill outer dest IP first; encapsulated-TLS classifier as defense-in-depth.</p>
+      </article>
+
+      <article class="adv">
+        <h3 id="m25">25. obfs4 / DNSTT (HA Tunnel DNS mode)</h3>
+        <p class="wire"><strong>On the wire:</strong> Tor obfs4 bridges or DNSTT DNS tunneling — HA Tunnel “DNS mode” consumer analogue.</p>
+        <p><strong>Lab setup:</strong> obfs4 bridge or DNSTT authoritative zone on operator infra.</p>
+        <p><strong>Defender:</strong> Default-deny DNS tunneling on pack; entropy + query-rate limits.</p>
+      </article>
+    </section>
 
     <section id="advanced" class="panel">
       <h2>Advanced SOC checklist (not separate app fronts)</h2>

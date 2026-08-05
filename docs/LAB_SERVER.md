@@ -35,6 +35,10 @@ sudo ufw allow 443/tcp
 
 For scenario `TLS_FULL_SNI`, terminate TLS on the VPS (stunnel/sslh) and forward to sshd. ClientHello-only mode does **not** need stunnel.
 
+For scenarios `WS_TLS_FRONT`, `HTTP2_PREAMBLE_SNI`, `TROJAN_HTTP_CAMOUFLAGE`: sshd must tolerate injected bytes before SSH, or run a lab proxy that strips the front and forwards to sshd on localhost:22.
+
+For doc-only drills (Reality, VMess, Shadowsocks, Hysteria, obfs4/DNSTT): deploy matching server software on the operator VPS; use sing-box or Xray — never public free nodes.
+
 ## Safety
 
 - Restrict SSH to your SOC source IPs when possible.

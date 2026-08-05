@@ -9,7 +9,12 @@ import java.security.SecureRandom
 object TlsClientHelloBuilder {
     private val random = SecureRandom()
 
-    fun build(serverName: String): ByteArray {
+    fun build(serverName: String): ByteArray = buildWithProfile(serverName, chromeLike = false)
+
+    /** Chrome 120–style extension set/order for JA3/JA4 mimic drills (static template, no uTLS dep). */
+    fun buildChromeLike(serverName: String): ByteArray = buildWithProfile(serverName, chromeLike = true)
+
+    private fun buildWithProfile(serverName: String, chromeLike: Boolean): ByteArray {
         val hostname = serverName.toByteArray(Charsets.US_ASCII)
         val extensions = ByteArrayOutputStream()
 
@@ -32,11 +37,20 @@ object TlsClientHelloBuilder {
         extensions.write(0) // uncompressed
 
         // supported_groups
-        val groups = byteArrayOf(
-            0x00, 0x1d, // x25519
-            0x00, 0x17, // secp256r1
-            0x00, 0x18  // secp384r1
-        )
+        val groups = if (chromeLike) {
+            byteArrayOf(
+                0x00, 0x2d, // P-256
+                0x00, 0x1d, // x25519
+                0x00, 0x1e, // P-384
+                0x00, 0x17  // secp256r1 legacy
+            )
+        } else {
+            byteArrayOf(
+                0x00, 0x1d, // x25519
+                0x00, 0x17, // secp256r1
+                0x00, 0x18  // secp384r1
+            )
+        }
         extensions.writeShort(0x000a)
         extensions.writeShort(groups.size + 2)
         extensions.writeShort(groups.size)
@@ -51,18 +65,76 @@ object TlsClientHelloBuilder {
         extensions.writeShort(sigs.size)
         extensions.write(sigs)
 
+        if (chromeLike) {
+            // application_layer_protocol_negotiation — h2, http/1.1 (Chrome order)
+            val alpn = byteArrayOf(
+                0x00, 0x02, 'h'.code.toByte(), '2'.code.toByte(),
+                0x00, 0x08,
+                'h'.code.toByte(), 't'.code.toByte(), 't'.code.toByte(), 'p'.code.toByte(),
+                '/'.code.toByte(), '1'.code.toByte(), '.'.code.toByte(), '1'.code.toByte()
+            )
+            extensions.writeShort(0x0010)
+            extensions.writeShort(alpn.size + 2)
+            extensions.writeShort(alpn.size)
+            extensions.write(alpn)
+
+            // supported_versions TLS 1.3 + 1.2
+            val versions = byteArrayOf(0x02, 0x03, 0x04, 0x03, 0x03)
+            extensions.writeShort(0x002b)
+            extensions.writeShort(versions.size + 1)
+            extensions.write(versions.size)
+            extensions.write(versions)
+
+            // psk_key_exchange_modes
+            extensions.writeShort(0x002d)
+            extensions.writeShort(2)
+            extensions.write(1)
+            extensions.write(1) // psk_dhe_ke
+
+            // key_share x25519 placeholder
+            val keyShare = byteArrayOf(
+                0x00, 0x1d, 0x00, 0x20
+            ) + ByteArray(32).also { random.nextBytes(it) }
+            extensions.writeShort(0x0033)
+            extensions.writeShort(keyShare.size + 2)
+            extensions.writeShort(keyShare.size)
+            extensions.write(keyShare)
+
+            // compress_certificate (brotli) — seen on modern Chrome
+            extensions.writeShort(0x001b)
+            extensions.writeShort(3)
+            extensions.write(2)
+            extensions.write(0x01) // brotli
+            extensions.write(0x02) // zlib
+        }
+
         val extBytes = extensions.toByteArray()
 
-        val cipherSuites = byteArrayOf(
-            0x13, 0x01, // TLS_AES_128_GCM_SHA256
-            0x13, 0x02, // TLS_AES_256_GCM_SHA384
-            0xc0.toByte(), 0x2b, // ECDHE_ECDSA_AES_128_GCM
-            0xc0.toByte(), 0x2f, // ECDHE_RSA_AES_128_GCM
-            0xc0.toByte(), 0x2c, // ECDHE_ECDSA_AES_256_GCM
-            0xc0.toByte(), 0x30, // ECDHE_RSA_AES_256_GCM
-            0x00, 0x9e.toByte(), // DHE_RSA_AES_128_GCM
-            0x00, 0x33  // DHE_RSA_AES_128_CBC_SHA
-        )
+        val cipherSuites = if (chromeLike) {
+            byteArrayOf(
+                0x13, 0x01, // TLS_AES_128_GCM_SHA256
+                0x13, 0x02, // TLS_AES_256_GCM_SHA384
+                0x13, 0x03, // TLS_CHACHA20_POLY1305_SHA256
+                0xc0.toByte(), 0x2b, // ECDHE_ECDSA_AES_128_GCM
+                0xc0.toByte(), 0x2f, // ECDHE_RSA_AES_128_GCM
+                0xc0.toByte(), 0x2c, // ECDHE_ECDSA_AES_256_GCM
+                0xc0.toByte(), 0x30, // ECDHE_RSA_AES_256_GCM
+                0x00, 0x9e.toByte(), // DHE_RSA_AES_128_GCM
+                0x00, 0x33, // DHE_RSA_AES_128_CBC_SHA
+                0x00, 0x3d  // TLS_RSA_AES_128_CBC_SHA (legacy Chrome list tail)
+            )
+        } else {
+            byteArrayOf(
+                0x13, 0x01, // TLS_AES_128_GCM_SHA256
+                0x13, 0x02, // TLS_AES_256_GCM_SHA384
+                0xc0.toByte(), 0x2b, // ECDHE_ECDSA_AES_128_GCM
+                0xc0.toByte(), 0x2f, // ECDHE_RSA_AES_128_GCM
+                0xc0.toByte(), 0x2c, // ECDHE_ECDSA_AES_256_GCM
+                0xc0.toByte(), 0x30, // ECDHE_RSA_AES_256_GCM
+                0x00, 0x9e.toByte(), // DHE_RSA_AES_128_GCM
+                0x00, 0x33  // DHE_RSA_AES_128_CBC_SHA
+            )
+        }
 
         val sessionId = ByteArray(32).also { random.nextBytes(it) }
         val clientRandom = ByteArray(32).also { random.nextBytes(it) }

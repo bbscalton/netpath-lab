@@ -79,6 +79,10 @@ class MainActivity : AppCompatActivity() {
                     FrontMode.TLS_SNI_FULL -> "Custom SNI full TLS"
                     FrontMode.HTTP_INJECT -> "HTTP Inject"
                     FrontMode.DIRECT -> "Direct (no SNI front)"
+                    FrontMode.HTTP_WEBSOCKET_TLS -> "WebSocket upgrade + TLS SNI"
+                    FrontMode.HTTP2_PREAMBLE_TLS -> "HTTP/2 preface + TLS SNI"
+                    FrontMode.TLS_CHROME_JA3_MIMIC -> "Chrome JA3 mimic ClientHello"
+                    FrontMode.TROJAN_HTTP_CAMOUFLAGE -> "Trojan HTTP camouflage"
                 }
             }
         )

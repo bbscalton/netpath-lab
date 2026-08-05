@@ -6,6 +6,7 @@ import com.netpath.lab.log.SessionLog
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.Socket
+import java.security.SecureRandom
 
 /**
  * Builds the TCP (and optional TLS/HTTP) front path to the SSH server,
@@ -14,13 +15,16 @@ import java.net.Socket
 class FrontDoorFactory(
     private val protectSocket: (Socket) -> Unit
 ) {
+    private val random = SecureRandom()
+
     fun open(profile: TunnelProfile): Socket {
         val dialHost = resolveDialHost(profile)
         val dialPort = profile.serverPort
         SessionLog.append(
             "Front mode=${profile.frontMode} dial=$dialHost:$dialPort " +
                 "sni='${profile.customSni}' realmV2=${profile.useRealmHostV2} " +
-                "preserveSni=${profile.preserveSni} tcpPayload=${profile.useTcpPayload}"
+                "preserveSni=${profile.preserveSni} tcpPayload=${profile.useTcpPayload} " +
+                "frontPadding=${profile.useFrontPadding}"
         )
 
         val tcp = Socket()
@@ -37,11 +41,22 @@ class FrontDoorFactory(
             SessionLog.append("TCP payload sent (${bytes.size} bytes)")
         }
 
+        if (profile.useFrontPadding && profile.frontPaddingMaxBytes > 0) {
+            val padLen = random.nextInt(profile.frontPaddingMaxBytes.coerceAtMost(512)) + 1
+            tcp.getOutputStream().write(ByteArray(padLen))
+            tcp.getOutputStream().flush()
+            SessionLog.append("Front random padding sent ($padLen zero bytes)")
+        }
+
         return when (profile.frontMode) {
             FrontMode.DIRECT -> DirectFront.apply(tcp)
             FrontMode.HTTP_INJECT -> HttpInjectFront.apply(tcp, profile)
             FrontMode.TLS_SNI_CLIENTHELLO_ONLY -> TlsSniFront.clientHelloOnly(tcp, profile)
             FrontMode.TLS_SNI_FULL -> TlsSniFront.fullHandshake(tcp, profile)
+            FrontMode.HTTP_WEBSOCKET_TLS -> WebSocketTlsFront.apply(tcp, profile)
+            FrontMode.HTTP2_PREAMBLE_TLS -> Http2PreambleFront.apply(tcp, profile)
+            FrontMode.TLS_CHROME_JA3_MIMIC -> TlsSniFront.chromeJa3Mimic(tcp, profile)
+            FrontMode.TROJAN_HTTP_CAMOUFLAGE -> TrojanCamouflageFront.apply(tcp, profile)
         }
     }
 

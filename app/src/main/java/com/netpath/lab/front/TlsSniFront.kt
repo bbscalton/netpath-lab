@@ -38,6 +38,18 @@ object TlsSniFront {
         return socket
     }
 
+    fun chromeJa3Mimic(socket: Socket, profile: TunnelProfile): Socket {
+        val name = sniName(profile)
+        val hello = TlsClientHelloBuilder.buildChromeLike(name)
+        val out = socket.getOutputStream()
+        out.write(hello)
+        out.flush()
+        SessionLog.append(
+            "TLS Chrome-like ClientHello (JA3 mimic) SNI=$name — compare JA3/JA4 in SOC capture"
+        )
+        return socket
+    }
+
     fun fullHandshake(socket: Socket, profile: TunnelProfile): SSLSocket {
         val name = sniName(profile)
         val trustAll = arrayOf<TrustManager>(object : X509TrustManager {

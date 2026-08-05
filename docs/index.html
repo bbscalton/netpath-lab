@@ -16,6 +16,7 @@
     <a class="brand" href="index.html">NetPath Lab</a>
     <nav>
       <a href="#download">Download</a>
+      <a href="methods.html">Methods</a>
       <a href="#guide">Guide</a>
       <a href="#stack">Custom Setup</a>
       <a href="#server">Lab server</a>
@@ -33,7 +34,7 @@
       </p>
       <div class="cta">
         <a class="btn primary" href="downloads/netpath-lab.apk" download>Download APK</a>
-        <a class="btn ghost" href="#guide">Start the guide</a>
+        <a class="btn ghost" href="methods.html">All bypass methods</a>
       </div>
       <p class="meta">~12 MB · Android 8+ · package <code>com.netpath.lab</code></p>
     </section>
@@ -48,6 +49,7 @@
       </ol>
       <p class="note">Install only on devices you control. Sideloading is intentional for lab builds.</p>
       <a class="btn primary" href="downloads/netpath-lab.apk" download>netpath-lab.apk</a>
+      <a class="btn ghost" href="methods.html">Configure each method</a>
     </section>
 
     <section id="guide" class="panel">
@@ -63,13 +65,34 @@
         </article>
         <article>
           <h3>3. Pack APN test</h3>
-          <p>Switch to pack/zero-rate SIM. Apply scenario <em>Custom Setup hold stack</em> or <em>SNI mismatch</em>.</p>
+          <p>Switch to pack/zero-rate SIM. Apply any method from the in-app spinner (start with SNI mismatch or full hold stack).</p>
         </article>
         <article>
           <h3>4. Score it</h3>
           <p><strong>PASS:</strong> blocked or fully charged.<br /><strong>FAIL:</strong> unmetered success to your VPS = allowlist gap.</p>
         </article>
       </div>
+    </section>
+
+    <section id="methods-overview" class="panel">
+      <h2>Bypass methods (in app + docs)</h2>
+      <p>Each entry is selectable in the app <strong>Bypass methods</strong> spinner and fully documented on the methods page.</p>
+      <ol class="method-index">
+        <li><a href="methods.html#m1">SNI mismatch / Custom SNI (ClientHello-only)</a></li>
+        <li><a href="methods.html#m2">Preserve SNI</a></li>
+        <li><a href="methods.html#m3">Realm Host v2</a></li>
+        <li><a href="methods.html#m4">Realm Host v2 + Preserve SNI</a></li>
+        <li><a href="methods.html#m5">TCP Payload + Preserve SNI</a></li>
+        <li><a href="methods.html#m6">HTTP Host / CONNECT inject</a></li>
+        <li><a href="methods.html#m7">SSH on 443 Direct (no inject)</a></li>
+        <li><a href="methods.html#m8">Full TLS wrap + Custom SNI (stunnel)</a></li>
+        <li><a href="methods.html#m9">Port fallback hold stack (443→80→8080)</a></li>
+        <li><a href="methods.html#m10">www. SNI toggle</a></li>
+        <li><a href="methods.html#m11">Custom Setup full hold stack</a></li>
+        <li><a href="methods.html#scoring">Billing / zero-rate miss drill framing</a></li>
+      </ol>
+      <p class="note">Also covered for SOC: APN/bearer confusion, IPv6 vs IPv4 asymmetry, over-broad CDN ASN allowlists — see <a href="methods.html#advanced">advanced checklist</a>.</p>
+      <a class="btn primary" href="methods.html">Open full method how-tos</a>
     </section>
 
     <section id="stack" class="panel">
@@ -127,6 +150,7 @@ sudo ufw allow 443/tcp
 sudo adduser netpath</code></pre>
       <p>In the app: host = VPS public IP, port = 443, username/password = lab user.</p>
       <p>For <strong>SNI mismatch</strong>: Custom SNI = a pack-like hostname; dial host stays your VPS IP.</p>
+      <p>For <strong>full TLS wrap</strong> (method 8): terminate TLS with stunnel/sslh in front of sshd.</p>
     </section>
 
     <section id="roe" class="panel warn">
@@ -142,15 +166,15 @@ sudo adduser netpath</code></pre>
     <section class="panel">
       <h2>In-app Learn</h2>
       <p>
-        Open <strong>Learn / SOC</strong> in the app for wire techniques, PASS/FAIL criteria, and detection checklist
-        (IP allowlists, SNI≠IP mismatch, hosting ASN, quotas).
+        Open <strong>Learn / SOC</strong> in the app for the full methods catalog, PASS/FAIL criteria, and detection checklist
+        (IP allowlists, SNI≠IP mismatch, hosting ASN, quotas, APN/IPv6/ASN notes).
       </p>
     </section>
   </main>
 
   <footer>
     <p>NetPath Lab · authorized ISP red-team training · hosted on GitHub Pages</p>
-    <p><a href="https://github.com/bbscalton/netpath-lab">Source on GitHub</a></p>
+    <p><a href="https://github.com/bbscalton/netpath-lab">Source on GitHub</a> · <a href="methods.html">Methods</a></p>
   </footer>
 </body>
 </html>

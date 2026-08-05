@@ -8,7 +8,9 @@
     <string name="save_profile">Save profile</string>
     <string name="export_log">Export log + config</string>
     <string name="learn">Learn / SOC</string>
-    <string name="scenarios">Training scenarios</string>
+    <string name="scenarios">Bypass methods (select &amp; apply)</string>
+    <string name="apply_method">Apply method to form</string>
+    <string name="method_steps_hint">Method steps appear here after you select or apply a method.</string>
     <string name="vpn_notification_title">NetPath Lab tunnel</string>
     <string name="vpn_notification_text">Lab tunnel session active</string>
     <string name="vpn_notification_keepalive">Lab tunnel keep-alive — do not force-stop</string>

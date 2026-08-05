@@ -385,17 +385,36 @@
             android:textColor="@color/np_accent"
             android:textStyle="bold" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:text="Each method sets Custom Setup knobs for an authorized pack/zero-rate drill. Destination must be YOUR lab VPS."
+            android:textColor="@color/np_muted"
+            android:textSize="11sp" />
+
         <Spinner
             android:id="@+id/spinnerScenario"
             android:layout_width="match_parent"
             android:layout_height="48dp" />
+
+        <TextView
+            android:id="@+id/methodStepsView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:background="@color/np_surface"
+            android:padding="10dp"
+            android:text="@string/method_steps_hint"
+            android:textColor="@color/np_text"
+            android:textSize="11sp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnApplyScenario"
             style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Apply scenario to form" />
+            android:text="@string/apply_method" />
 
         <LinearLayout
             android:layout_width="match_parent"

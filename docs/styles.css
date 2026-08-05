@@ -178,6 +178,49 @@ pre.stack, pre.code {
 ul { color: var(--muted); }
 ul strong { color: var(--text); }
 
+.method-index {
+  color: var(--muted);
+  padding-left: 1.2rem;
+}
+.method-index li { margin-bottom: 0.4rem; }
+.method-index a {
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+.method-index a:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.toc-list {
+  columns: 2;
+  gap: 1.5rem;
+  color: var(--muted);
+  padding-left: 1.2rem;
+  margin: 0;
+}
+.toc-list a {
+  color: var(--text);
+  text-decoration: none;
+}
+.toc-list a:hover { color: var(--accent); }
+
+.method .wire {
+  color: var(--muted);
+  margin-top: 0;
+}
+.method h3 {
+  margin-top: 1rem;
+}
+.adv {
+  margin-top: 1rem;
+  padding: 0.85rem 0 0;
+  border-top: 1px solid var(--line);
+}
+.adv:first-of-type { border-top: none; padding-top: 0; }
+.adv p { color: var(--muted); margin: 0.35rem 0; }
+
 footer {
   width: min(880px, calc(100% - 2rem));
   margin: 0 auto 2rem;
@@ -195,4 +238,5 @@ footer a { color: var(--accent); }
 
 @media (max-width: 640px) {
   .top { flex-direction: column; align-items: flex-start; }
+  .toc-list { columns: 1; }
 }

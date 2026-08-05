@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bypass methods — NetPath Lab</title>
+  <meta name="description" content="Authorized ISP lab: configuration how-to for every NetPath Lab billing-evasion drill method." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="bg"></div>
+  <header class="top">
+    <a class="brand" href="index.html">NetPath Lab</a>
+    <nav>
+      <a href="index.html#download">Download</a>
+      <a href="methods.html">Methods</a>
+      <a href="index.html#stack">Custom Setup</a>
+      <a href="index.html#server">Lab server</a>
+      <a href="index.html#roe">Rules</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">ISP / SOC training catalog</p>
+      <h1>Bypass methods</h1>
+      <p class="lede">
+        Every method below matches an in-app spinner entry. Destination must be an
+        <strong>operator-owned VPS</strong>. Use only on networks you are authorized to test.
+      </p>
+      <div class="cta">
+        <a class="btn primary" href="downloads/netpath-lab.apk" download>Download APK</a>
+        <a class="btn ghost" href="#scoring">PASS / FAIL scoring</a>
+      </div>
+    </section>
+
+    <section id="scoring" class="panel warn">
+      <h2>12. Billing / zero-rate miss drill (framing)</h2>
+      <p>
+        Apply this scoring frame to <em>every</em> method 1–11. You are testing whether pack/zero-rate
+        controls miss real data usage to your VPS.
+      </p>
+      <ul>
+        <li><strong>PASS:</strong> session blocked/stalled, or fully charged on the general rating group.</li>
+        <li><strong>FAIL:</strong> unmetered success while real bytes reach the operator VPS (allowlist/policy gap).</li>
+      </ul>
+      <p class="note">Always generate real tunneled traffic — idle TCP alone is a weak billing test.</p>
+      <h3>App settings</h3>
+      <p>Select method <em>12. Billing / zero-rate miss drill</em> to apply a SNI-mismatch baseline, then run any method 1–11 on pack SIM.</p>
+      <h3>Defender fix</h3>
+      <p>Destination IP/prefix allowlists on the pack bearer; SNI≠IP mismatch deny/rate; quotas + hosting-ASN scoring.</p>
+    </section>
+
+    <nav class="toc panel">
+      <h2>Jump to method</h2>
+      <ol class="toc-list">
+        <li><a href="#m1">SNI mismatch / Custom SNI</a></li>
+        <li><a href="#m2">Preserve SNI</a></li>
+        <li><a href="#m3">Realm Host v2</a></li>
+        <li><a href="#m4">Realm Host v2 + Preserve SNI</a></li>
+        <li><a href="#m5">TCP Payload + Preserve SNI</a></li>
+        <li><a href="#m6">HTTP Host / CONNECT inject</a></li>
+        <li><a href="#m7">SSH on 443 Direct</a></li>
+        <li><a href="#m8">Full TLS wrap + Custom SNI</a></li>
+        <li><a href="#m9">Port fallback hold stack</a></li>
+        <li><a href="#m10">www. SNI toggle</a></li>
+        <li><a href="#m11">Custom Setup full hold stack</a></li>
+        <li><a href="#scoring">Billing / zero-rate framing</a></li>
+        <li><a href="#advanced">Advanced SOC checklist</a></li>
+      </ol>
+    </nav>
+
+    <article id="m1" class="panel method">
+      <h2>1. SNI mismatch / Custom SNI (ClientHello-only)</h2>
+      <p class="wire"><strong>On the wire:</strong> TCP to VPS:443 → TLS ClientHello with SNI = pack-like hostname → SSH2 on same socket (no full TLS). Classic SNI≠IP mismatch.</p>
+      <h3>Exact app settings</h3>
+      <ol class="steps">
+        <li>SSH host = VPS public IPv4; username/password or PEM for lab user.</li>
+        <li>Port = <code>443</code>.</li>
+        <li>Front = <em>Custom SNI (SSL/TLS Mode)</em>.</li>
+        <li>Custom SNI = pack-like hostname (training); dial host stays VPS IP.</li>
+        <li>Preserve SNI <strong>ON</strong>; Realm Host v2 <strong>OFF</strong>; TCP Payload <strong>OFF</strong>; www. <strong>OFF</strong>.</li>
+        <li>Apply method <em>1. SNI mismatch…</em> or set manually → Connect on pack SIM.</li>
+      </ol>
+      <h3>Lab server</h3>
+      <p>OpenSSH on :443. ClientHello-only does <em>not</em> need stunnel.</p>
+      <h3>PASS / FAIL</h3>
+      <p>PASS if pack drops/rates off-allowlist dest. FAIL if unmetered success to VPS.</p>
+      <h3>Defender fix</h3>
+      <p>If SNI ∈ pack domains and dest IP ∉ allowlist → deny or rate. Never trust SNI alone for zero-rate.</p>
+    </article>
+
+    <article id="m2" class="panel method">
+      <h2>2. Preserve SNI</h2>
+      <p class="wire"><strong>On the wire:</strong> Same ClientHello-only front; Custom SNI is never rewritten to the SSH hostname for the session.</p>
+      <h3>Exact app settings</h3>
+      <ol class="steps">
+        <li>Host = VPS IP; Custom SNI = pack-like name.</li>
+        <li>Front = Custom SNI (SSL/TLS Mode).</li>
+        <li>Preserve SNI <strong>ON</strong>; Realm Host v2 <strong>OFF</strong>; www. <strong>OFF</strong>.</li>
+        <li>Apply method <em>2. Preserve SNI</em> → confirm Effective SNI label → Connect.</li>
+      </ol>
+      <h3>Lab server</h3>
+      <p>Same as method 1 (sshd on 443).</p>
+      <h3>PASS / FAIL</h3>
+      <p>IP allowlist should still catch VPS destinations regardless of preserved SNI string.</p>
+      <h3>Defender fix</h3>
+      <p>Policy keyed on dest IP/prefix, not on whether the client “preserves” SNI.</p>
+    </article>
+
+    <article id="m3" class="panel method">
+      <h2>3. Realm Host v2</h2>
+      <p class="wire"><strong>On the wire:</strong> Consumer apps alternate realm/dial ordering. Lab still dials VPS IP; realm hostname is resolved for logging/identity only.</p>
+      <h3>Exact app settings</h3>
+      <ol class="steps">
+        <li>Host = VPS IP; Custom SNI = realm/pack-like hostname.</li>
+        <li>Front = Custom SNI (SSL/TLS Mode).</li>
+        <li>Use Realm Host (v2) <strong>ON</strong>; Preserve SNI <strong>OFF</strong> for this isolated drill.</li>
+        <li>Apply method <em>3. Realm Host v2</em>; watch Session log for RealmV2 lines.</li>
+      </ol>
+      <h3>Lab server</h3>
+      <p>sshd on dial port; DNS for Custom SNI may resolve publicly (for log realism) but traffic must still hit your VPS.</p>
+      <h3>PASS / FAIL</h3>
+      <p>Realm toggle must not bypass destination-IP policy.</p>
+      <h3>Defender fix</h3>
+      <p>Enforce on observed destination IP of the TCP flow, independent of client realm UI.</p>
+    </article>
+
+    <article id="m4" class="panel method">
+      <h2>4. Realm Host v2 + Preserve SNI</h2>
+      <p class="wire"><strong>On the wire:</strong> Combined consumer hold path — realm semantics + preserved Custom SNI ClientHello.</p>
+      <h3>Exact app settings</h3>
+      <ol class="steps">
+        <li>Host = VPS IP; Custom SNI = pack-like hostname.</li>
+        <li>Front = Custom SNI (SSL/TLS Mode).</li>
+        <li>Realm Host v2 <strong>ON</strong> + Preserve SNI <strong>ON</strong>; TCP Payload <strong>OFF</strong>.</li>
+        <li>Apply method <em>4. Realm Host v2 + Preserve SNI</em> → Connect; compare to methods 1 and 3.</li>
+      </ol>
+      <h3>Lab server</h3>
+      <p>Same as method 1.</p>
+      <h3>PASS / FAIL</h3>
+      <p>Toggle order must not matter if enforcement is destination-IP based.</p>
+      <h3>Defender fix</h3>
+      <p>Same IP allowlist + SNI≠IP mismatch rules as method 1.</p>
+    </article>
+
+    <article id="m5" class="panel method">
+      <h2>5. TCP Payload + Preserve SNI</h2>
+      <p class="wire"><strong>On the wire:</strong> Optional prepended TCP bytes (hex), then ClientHello-only with preserved SNI, then SSH.</p>
+      <h3>Exact app settings</h3>
+      <ol class="steps">
+        <li>Host = VPS IP; Port = 443.</li>
+        <li>Front = Custom SNI (SSL/TLS Mode); Preserve SNI <strong>ON</strong>.</li>
+        <li>Use TCP Payload <strong>ON</strong>; hex default <code>160301</code> (or operator lab value).</li>
+        <li>Realm Host v2 <strong>OFF</strong>. Apply method <em>5. TCP Payload + Preserve SNI</em>.</li>
+      </ol>
+      <h3>Lab server</h3>
+      <p>sshd must tolerate prepended bytes before SSH (or terminate a front that strips them). ClientHello-only path typically writes payload then hello then SSH — validate in lab capture.</p>
+      <h3>PASS / FAIL</h3>
+      <p>Payload cosmetics should not bypass IP allowlists.</p>
+      <h3>Defender fix</h3>
+      <p>Do not rely on signature-only filters of the first few bytes; key on dest IP + flow behavior.</p>
+    </article>
+
+    <article id="m6" class="panel method">
+      <h2>6. HTTP Host / CONNECT inject</h2>
+      <p class="wire"><strong>On the wire:</strong> ASCII HTTP <code>CONNECT</code>/<code>Host</code> before SSH bytes on the TCP session.</p>
+      <h3>Exact app settings</h3>
+      <ol class="steps">
+        <li>Host = VPS IP; port typically 80 or 443.</li>
+        <li>Front = <em>HTTP Inject</em>.</li>
+        <li>HTTP payload Host/CONNECT target = pack-like name (filled from Custom SNI).</li>
+        <li>Apply method <em>6. HTTP Host / CONNECT inject</em> → Connect.</li>
+      </ol>
+      <h3>Lab server</h3>
+      <p>Path that accepts inject-then-SSH, or a simple proxy that forwards to sshd. Correlate DPI Host header vs true dest IP.</p>
+      <h3>PASS / FAIL</h3>
+      <p>Validate HTTP on pack ports; do not forward arbitrary CONNECT to off-list IPs.</p>
+      <h3>Defender fix</h3>
+      <p>Strict CONNECT destination checks against allowlists; refuse off-list IPs on pack bearer.</p>
+    </article>
+
+    <article id="m7" class="panel method">
+      <h2>7. SSH on 443 Direct (no inject)</h2>
+      <p class="wire"><strong>On the wire:</strong> Raw SSH banner/handshake to VPS:443 — no HTTP/TLS front.</p>
+      <h3>Exact app settings</h3>
+      <ol class="steps">
+        <li>Ensure OpenSSH listens on VPS <code>:443</code>.</li>
+        <li>Host = VPS IP; Port = 443.</li>
+        <li>Front = <em>Direct (no SNI front)</em>; all inject toggles OFF.</li>
+        <li>Apply method <em>7. SSH on 443 Direct</em> → Connect.</li>
+      </ol>
+      <h3>Lab server</h3>
+      <pre class="code"><code>Port 443 in sshd_config.d/netpath-lab.conf
+sudo ufw allow 443/tcp</code></pre>
+      <h3>PASS / FAIL</h3>
+      <p>SSH banner on pack bearer to hosting ASN should be probed and denied/rated.</p>
+      <h3>Defender fix</h3>
+      <p>Active probe / fingerprint on pack; hosting-ASN + long multiplex scoring.</p>
+    </article>
+
+    <article id="m8" class="panel method">
+      <h2>8. Full TLS wrap + Custom SNI (stunnel)</h2>
+      <p class="wire"><strong>On the wire:</strong> Complete TLS handshake (SNI = pack-like) to stunnel/sslh, then SSH inside the TLS tunnel.</p>
+      <h3>Exact app settings</h3>
+      <ol class="steps">
+        <li>On VPS: terminate TLS (stunnel/sslh) and forward to sshd.</li>
+        <li>Host = VPS IP; Port = stunnel listen (often 443).</li>
+        <li>Front = <em>Custom SNI full TLS</em>; Preserve SNI <strong>ON</strong>.</li>
+        <li>Apply method <em>8. Full TLS wrap + Custom SNI</em>. (ClientHello-only drills do <em>not</em> need stunnel.)</li>
+      </ol>
+      <h3>Lab server</h3>
+      <p>stunnel or sslh in front of sshd; lab certs are trusted by the app for this drill.</p>
+      <h3>PASS / FAIL</h3>
+      <p>Full TLS to a VPS is still not a pack CDN — dest IP allowlists must apply.</p>
+      <h3>Defender fix</h3>
+      <p>Same as method 1; encrypted inner SSH does not change outer destination identity.</p>
+    </article>
+
+    <article id="m9" class="panel method">
+      <h2>9. Port fallback hold stack (443→80→8080)</h2>
+      <p class="wire"><strong>On the wire:</strong> On connect failure, client retries hold ports 443 → 80 → 8080 with the same front.</p>
+      <h3>Exact app settings</h3>
+      <ol class="steps">
+        <li>Host = VPS IP; open sshd (or front) on at least one of 443 / 80 / 8080.</li>
+        <li>Front = Custom SNI (SSL/TLS Mode); Preserve SNI <strong>ON</strong>.</li>
+        <li>Enable <em>Port fallback (try 443 → 80 → 8080)</em>; primary port can start at 443.</li>
+        <li>Apply method <em>9. Port fallback hold stack</em>; Session log shows which port succeeded.</li>
+      </ol>
+      <h3>Lab server</h3>
+      <p>Listen on multiple ports or intentionally close 443 to force fallback during the drill.</p>
+      <h3>PASS / FAIL</h3>
+      <p>Pack policy must cover all hold ports, not only 443.</p>
+      <h3>Defender fix</h3>
+      <p>Same allowlist/deny on 80 and 8080 as on 443 for the pack bearer.</p>
+    </article>
+
+    <article id="m10" class="panel method">
+      <h2>10. www. SNI toggle</h2>
+      <p class="wire"><strong>On the wire:</strong> ClientHello SNI flips <code>www.</code> prefix (exact-host ISP match games).</p>
+      <h3>Exact app settings</h3>
+      <ol class="steps">
+        <li>Host = VPS IP; Custom SNI = bare pack-like host (e.g. <code>example.com</code>).</li>
+        <li>Front = Custom SNI (SSL/TLS Mode); Preserve SNI <strong>ON</strong>.</li>
+        <li>Turn <em>Fresh SNI / www. toggle</em> <strong>ON</strong> — Effective SNI becomes <code>www.example.com</code> (or strips www.).</li>
+        <li>Apply method <em>10. www. SNI toggle</em>; compare to toggle OFF.</li>
+      </ol>
+      <h3>Lab server</h3>
+      <p>Same as method 1.</p>
+      <h3>PASS / FAIL</h3>
+      <p>Exact hostname games must still lose to dest-IP allowlists.</p>
+      <h3>Defender fix</h3>
+      <p>Do not zero-rate based on exact SNI string equality alone.</p>
+    </article>
+
+    <article id="m11" class="panel method">
+      <h2>11. Custom Setup full hold stack</h2>
+      <p class="wire"><strong>On the wire:</strong> Full consumer-style path modeled by the in-app Custom Setup panel.</p>
+      <pre class="stack"><code>Custom Setup
+ → Direct Connection
+ → Custom SNI (SSL/TLS Mode)
+ → Realm Host v2 (optional)
+ → Preserve SNI
+ → TCP Payload (optional)
+ → Port 443 → 80 → 8080
+ → Nearby / stable server hint
+ → Protocol TCP
+ → www. toggle
+ → Keep VPN alive</code></pre>
+      <h3>Exact app settings</h3>
+      <ol class="steps">
+        <li>Enable Custom Setup master switch.</li>
+        <li>Path = Direct Connection; Front = Custom SNI (SSL/TLS Mode).</li>
+        <li>Custom SNI = pack-like host; Preserve SNI <strong>ON</strong>.</li>
+        <li>Port 443 + Port fallback <strong>ON</strong>; Protocol TCP; Nearby hint <strong>ON</strong>; Keep VPN alive <strong>ON</strong>.</li>
+        <li>Optional Realm / TCP Payload / www. for parity with a specific consumer app.</li>
+        <li>Apply method <em>11. Custom Setup full hold stack</em> → Connect on pack SIM.</li>
+      </ol>
+      <h3>Lab server</h3>
+      <p>sshd on 443 (and ideally 80/8080 if testing fallback).</p>
+      <h3>PASS / FAIL</h3>
+      <p>PASS if pack still blocks VPS dest despite full hold stack. FAIL if unmetered success.</p>
+      <h3>Defender fix</h3>
+      <p>None of these toggles should defeat a destination IP allowlist on the pack bearer.</p>
+    </article>
+
+    <section id="advanced" class="panel">
+      <h2>Advanced SOC checklist (not separate app fronts)</h2>
+      <p>Document these even when the Android client only notes them in Learn / Session log:</p>
+      <article class="adv">
+        <h3>APN / wrong bearer confusion</h3>
+        <p>Confirm the handset is on the pack/zero-rate APN under test (not Wi‑Fi, not general internet APN). Wrong bearer invalidates the drill.</p>
+        <p><strong>Defender:</strong> Log IMSI + APN + rating group with every flow ticket.</p>
+      </article>
+      <article class="adv">
+        <h3>IPv6 vs IPv4 asymmetry</h3>
+        <p>The lab app is <strong>IPv4-focused</strong>. Attackers may prefer IPv6 if pack allowlists exist only on v4.</p>
+        <p><strong>Defender checklist:</strong> identical prefix allowlists and deny semantics on IPv6; dual-stack test SIMs; no “IPv6 open by default.”</p>
+      </article>
+      <article class="adv">
+        <h3>Over-broad CDN ASN allowlist risk</h3>
+        <p>Allowlisting an entire CDN or cloud ASN creates unmetered escape hatches (any VPS in that ASN).</p>
+        <p><strong>Defender:</strong> Prefer tight service prefixes; refresh automatically; score long multiplex flows to hosting ASNs.</p>
+      </article>
+    </section>
+
+    <section class="panel warn" id="roe">
+      <h2>Rules of engagement</h2>
+      <ul>
+        <li>Authorized networks only — written permission from the ISP/SOC owner.</li>
+        <li>No free public SSH/VPN server lists. Bring your own VPS.</li>
+        <li>Do not use these techniques to steal service or attack third parties.</li>
+      </ul>
+      <a class="btn primary" href="downloads/netpath-lab.apk" download>Download APK</a>
+      <a class="btn ghost" href="index.html">Back to home</a>
+    </section>
+  </main>
+
+  <footer>
+    <p>NetPath Lab · methods catalog · matches in-app Bypass methods spinner</p>
+    <p><a href="https://github.com/bbscalton/netpath-lab">Source on GitHub</a></p>
+  </footer>
+</body>
+</html>

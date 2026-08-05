@@ -102,6 +102,13 @@ class MainActivity : AppCompatActivity() {
             android.R.layout.simple_spinner_dropdown_item,
             TrainingScenarios.all.map { it.title }
         )
+        binding.spinnerScenario.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                showMethodPreview(position)
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+        showMethodPreview(0)
 
         bindProfile(NetPathApp.instance.profileStore.load())
         wireCustomSetupListeners()
@@ -111,7 +118,13 @@ class MainActivity : AppCompatActivity() {
                 ?: return@setOnClickListener
             val applied = scenario.apply(readProfileFromForm())
             bindProfile(applied)
-            SessionLog.append("Applied scenario ${scenario.id}: ${scenario.defenderHint}")
+            val stepsText = TrainingScenarios.formatSteps(scenario)
+            binding.methodStepsView.text = stepsText
+            SessionLog.append("Applied method ${scenario.id}")
+            SessionLog.append(scenario.defenderHint)
+            scenario.steps.forEachIndexed { i, step ->
+                SessionLog.append("  step ${i + 1}: $step")
+            }
             Toast.makeText(this, scenario.defenderHint, Toast.LENGTH_LONG).show()
         }
 
@@ -154,6 +167,11 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             SessionLog.hint.collectLatest { binding.hintText.text = it }
         }
+    }
+
+    private fun showMethodPreview(position: Int) {
+        val scenario = TrainingScenarios.all.getOrNull(position) ?: return
+        binding.methodStepsView.text = TrainingScenarios.formatSteps(scenario)
     }
 
     private fun wireCustomSetupListeners() {

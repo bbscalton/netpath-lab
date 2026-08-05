@@ -21,6 +21,7 @@
       <a href="#guide">Guide</a>
       <a href="#stack">Custom Setup</a>
       <a href="#server">Lab server</a>
+      <a href="#probe">Windows probe</a>
       <a href="#roe">Rules</a>
     </nav>
   </header>
@@ -185,6 +186,25 @@ sudo adduser netpath</code></pre>
       <p>For <strong>full TLS wrap</strong> (method 8): terminate TLS with stunnel/sslh in front of sshd.</p>
       <p>For <strong>WebSocket / Trojan / HTTP/2 fronts</strong> (methods 13–16): sshd on 443 must accept leading non-SSH bytes before the SSH banner, or use a simple strip-and-forward proxy in the lab.</p>
       <p>For <strong>doc-only drills 18–25</strong> (Reality, VMess, Shadowsocks, Hysteria, etc.): deploy the matching server on your VPS with Xray/sing-box — not bundled in the APK.</p>
+    </section>
+
+    <section id="probe" class="panel">
+      <h2>Windows probe tool (SOC desktop)</h2>
+      <p>
+        Before handing a test phone to the field team, run the <strong>NetPath Probe</strong> on a Windows PC on the same network.
+        It loads every <code>.nplab.json</code>, sends the same front bytes as the Android app, and checks SSH auth against the lab server.
+      </p>
+      <ol class="steps">
+        <li>Clone <a href="https://github.com/bbscalton/netpath-lab">netpath-lab</a> (or use your fork).</li>
+        <li>Install <a href="https://www.python.org/downloads/">Python 3.10+</a> if needed.</li>
+        <li>Double-click <code>tools/netpath-probe/run.bat</code> — venv + dependencies install automatically.</li>
+        <li>Click <strong>Test server only</strong> → then <strong>Run all tests</strong>.</li>
+        <li>Open <code>tools/netpath-probe/reports/latest.html</code> for the recommended methods list.</li>
+      </ol>
+      <p class="note">
+        <strong>Local testing only.</strong> Configs contain lab credentials. Do not run on untrusted machines or share reports without redacting secrets.
+        See <a href="https://github.com/bbscalton/netpath-lab/blob/main/tools/netpath-probe/README.md">tools/netpath-probe/README.md</a>.
+      </p>
     </section>
 
     <section id="roe" class="panel warn">

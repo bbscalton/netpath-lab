@@ -11,3 +11,6 @@
 *.ap_
 *.dex
 build-log.txt
+tools/netpath-probe/venv/
+tools/netpath-probe/reports/
+**/__pycache__/

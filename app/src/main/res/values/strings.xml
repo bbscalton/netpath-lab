@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NetPath Lab</string>
+    <string name="tagline">Authorized ISP red-team tunnel lab</string>
+    <string name="roe_short">Use only on networks you own or are authorized to test. No public free servers are bundled.</string>
+    <string name="connect">Connect</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="save_profile">Save profile</string>
+    <string name="export_log">Export log + config</string>
+    <string name="learn">Learn / SOC</string>
+    <string name="scenarios">Training scenarios</string>
+    <string name="vpn_notification_title">NetPath Lab tunnel</string>
+    <string name="vpn_notification_text">Lab tunnel session active</string>
+    <string name="vpn_notification_keepalive">Lab tunnel keep-alive — do not force-stop</string>
+    <string name="channel_vpn">Tunnel</string>
+    <string name="custom_setup_title">Custom Setup</string>
+    <string name="custom_setup_subtitle">Hold stack: Direct → Custom SNI → Realm/Preserve/TCP payload → port → protocol → www. → keep-alive</string>
+    <string name="request_battery">Request battery unrestricted</string>
+</resources>

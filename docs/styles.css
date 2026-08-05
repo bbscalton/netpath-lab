@@ -1,0 +1,198 @@
+:root {
+  --bg: #0b1016;
+  --surface: #141c27;
+  --text: #e8eef5;
+  --muted: #8b9bb4;
+  --accent: #3ddc97;
+  --warn: #f4a261;
+  --danger: #e76f51;
+  --line: rgba(232, 238, 245, 0.08);
+  --font: "DM Sans", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: var(--font);
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.55;
+  min-height: 100vh;
+}
+
+.bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(900px 500px at 10% -10%, rgba(61, 220, 151, 0.16), transparent 55%),
+    radial-gradient(700px 400px at 90% 0%, rgba(244, 162, 97, 0.1), transparent 50%),
+    linear-gradient(180deg, #0b1016 0%, #0f1620 50%, #0b1016 100%);
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(8px);
+  position: sticky;
+  top: 0;
+  background: rgba(11, 16, 22, 0.85);
+  z-index: 10;
+}
+
+.brand {
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  font-size: 1.15rem;
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+}
+nav a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.92rem;
+}
+nav a:hover { color: var(--text); }
+
+main {
+  width: min(880px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 2.5rem 0 4rem;
+}
+
+.hero {
+  padding: 2rem 0 3rem;
+  animation: rise 0.7s ease both;
+}
+.eyebrow {
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem;
+}
+h1 {
+  font-size: clamp(2.4rem, 6vw, 3.6rem);
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  margin: 0 0 1rem;
+}
+.lede {
+  font-size: 1.15rem;
+  color: var(--muted);
+  max-width: 38rem;
+  margin: 0 0 1.5rem;
+}
+.cta { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.75rem; }
+.meta { color: var(--muted); font-size: 0.9rem; }
+.meta code, pre code, p code {
+  font-family: var(--mono);
+  font-size: 0.88em;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.2rem;
+  border-radius: 0.55rem;
+  text-decoration: none;
+  font-weight: 600;
+  border: 1px solid transparent;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn.primary {
+  background: var(--accent);
+  color: #062016;
+}
+.btn.ghost {
+  border-color: var(--line);
+  color: var(--text);
+  background: transparent;
+}
+
+.panel {
+  background: rgba(20, 28, 39, 0.72);
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  padding: 1.5rem 1.35rem;
+  margin-bottom: 1.25rem;
+  animation: rise 0.8s ease both;
+}
+.panel.warn { border-color: rgba(244, 162, 97, 0.35); }
+.panel h2 {
+  margin: 0 0 0.85rem;
+  letter-spacing: -0.02em;
+  font-size: 1.35rem;
+}
+.panel h3 {
+  margin: 0 0 0.4rem;
+  font-size: 1.05rem;
+  color: var(--accent);
+}
+
+.steps { margin: 0 0 1rem; padding-left: 1.2rem; color: var(--muted); }
+.steps li { margin-bottom: 0.45rem; }
+.steps strong { color: var(--text); }
+.note { color: var(--warn); font-size: 0.92rem; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+.grid article {
+  background: rgba(11, 16, 22, 0.45);
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  padding: 1rem;
+}
+.grid p { margin: 0; color: var(--muted); font-size: 0.92rem; }
+
+pre.stack, pre.code {
+  overflow-x: auto;
+  background: #0a0f14;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: #c6d4e3;
+}
+
+ul { color: var(--muted); }
+ul strong { color: var(--text); }
+
+footer {
+  width: min(880px, calc(100% - 2rem));
+  margin: 0 auto 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+footer a { color: var(--accent); }
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (max-width: 640px) {
+  .top { flex-direction: column; align-items: flex-start; }
+}

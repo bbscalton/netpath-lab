@@ -1,0 +1,3 @@
+-keep class net.schmizz.** { *; }
+-dontwarn net.schmizz.**
+-dontwarn org.ietf.jgss.**

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.NetPathLab" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/np_accent</item>
+        <item name="colorSecondary">@color/np_warn</item>
+        <item name="android:statusBarColor">@color/np_bg</item>
+        <item name="android:navigationBarColor">@color/np_bg</item>
+        <item name="android:windowBackground">@color/np_bg</item>
+        <item name="android:textColorPrimary">@color/np_text</item>
+    </style>
+</resources>

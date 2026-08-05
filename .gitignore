@@ -1,0 +1,13 @@
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+/app/build
+/captures
+*.apk
+!docs/downloads/netpath-lab.apk
+*.ap_
+*.dex
+build-log.txt

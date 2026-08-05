@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NetPath Lab — ISP Red-Team Tunnel Client</title>
+  <meta name="description" content="Authorized Android lab client for ISP/SOC teams to reproduce SSH+SNI tunnel techniques and harden pack/zero-rate controls." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="bg"></div>
+  <header class="top">
+    <a class="brand" href="index.html">NetPath Lab</a>
+    <nav>
+      <a href="#download">Download</a>
+      <a href="#guide">Guide</a>
+      <a href="#stack">Custom Setup</a>
+      <a href="#server">Lab server</a>
+      <a href="#roe">Rules</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">Authorized security testing</p>
+      <h1>NetPath Lab</h1>
+      <p class="lede">
+        An Android red-team client for ISP and SOC teams. Reproduce how consumer tunnel apps
+        front SSH with Custom SNI, then prove whether your pack/zero-rate controls actually hold.
+      </p>
+      <div class="cta">
+        <a class="btn primary" href="downloads/netpath-lab.apk" download>Download APK</a>
+        <a class="btn ghost" href="#guide">Start the guide</a>
+      </div>
+      <p class="meta">~12 MB · Android 8+ · package <code>com.netpath.lab</code></p>
+    </section>
+
+    <section id="download" class="panel">
+      <h2>Install on a test phone</h2>
+      <ol class="steps">
+        <li>On the phone, open this page and tap <strong>Download APK</strong>.</li>
+        <li>Allow install from this browser if Android asks.</li>
+        <li>Open <strong>NetPath Lab</strong> → grant VPN permission when you Connect.</li>
+        <li>Optional: tap <em>Request battery unrestricted</em> under Keep VPN alive.</li>
+      </ol>
+      <p class="note">Install only on devices you control. Sideloading is intentional for lab builds.</p>
+      <a class="btn primary" href="downloads/netpath-lab.apk" download>netpath-lab.apk</a>
+    </section>
+
+    <section id="guide" class="panel">
+      <h2>Team drill (15 minutes)</h2>
+      <div class="grid">
+        <article>
+          <h3>1. Lab VPS</h3>
+          <p>Stand up OpenSSH on a VPS you own. Prefer port <code>443</code>. See the server section below.</p>
+        </article>
+        <article>
+          <h3>2. Control test</h3>
+          <p>On Wi‑Fi or paid data: enter VPS host, user, password → Connect. Confirm SSH works.</p>
+        </article>
+        <article>
+          <h3>3. Pack APN test</h3>
+          <p>Switch to pack/zero-rate SIM. Apply scenario <em>Custom Setup hold stack</em> or <em>SNI mismatch</em>.</p>
+        </article>
+        <article>
+          <h3>4. Score it</h3>
+          <p><strong>PASS:</strong> blocked or fully charged.<br /><strong>FAIL:</strong> unmetered success to your VPS = allowlist gap.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="stack" class="panel">
+      <h2>Custom Setup hold stack</h2>
+      <p>What the in-app Custom Setup panel models (same path consumer apps use to “hold” a session):</p>
+      <pre class="stack" aria-label="Custom Setup flow"><code>Custom Setup
+   │
+   ▼
+Direct Connection
+   │
+   ▼
+Custom SNI (SSL/TLS Mode)     ← hostname X in ClientHello
+   │
+   ▼
+Use Realm Host (v2)
+   │
+   ▼
+Preserve SNI
+   │
+   ▼
+Use TCP Payload
+   │
+   ▼
+Port: 443 → 80 → 8080
+   │
+   ▼
+Nearby / stable server
+   │
+   ▼
+Protocol: TCP first
+   │
+   ▼
+Fresh SNI / www. toggle
+   │
+   ▼
+SSH tunnel up
+   │
+   ▼
+Keep app / VPN alive</code></pre>
+      <p class="note">Defender takeaway: none of these toggles should defeat a destination IP allowlist on the pack bearer.</p>
+    </section>
+
+    <section id="server" class="panel">
+      <h2>Lab server (your VPS)</h2>
+      <pre class="code"><code>sudo apt update &amp;&amp; sudo apt install -y openssh-server
+sudo tee /etc/ssh/sshd_config.d/netpath-lab.conf &lt;&lt;'EOF'
+Port 443
+PasswordAuthentication yes
+PubkeyAuthentication yes
+AllowTcpForwarding yes
+PermitTunnel no
+EOF
+sudo systemctl restart ssh
+sudo ufw allow 443/tcp
+sudo adduser netpath</code></pre>
+      <p>In the app: host = VPS public IP, port = 443, username/password = lab user.</p>
+      <p>For <strong>SNI mismatch</strong>: Custom SNI = a pack-like hostname; dial host stays your VPS IP.</p>
+    </section>
+
+    <section id="roe" class="panel warn">
+      <h2>Rules of engagement</h2>
+      <ul>
+        <li>Use only on networks you <strong>own</strong> or have <strong>written authorization</strong> to test.</li>
+        <li>No public free SSH/VPN servers are bundled — bring your own VPS.</li>
+        <li>Do not use this tool to steal service or attack third parties.</li>
+        <li>Export session logs for SOC tickets; redact secrets when sharing.</li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2>In-app Learn</h2>
+      <p>
+        Open <strong>Learn / SOC</strong> in the app for wire techniques, PASS/FAIL criteria, and detection checklist
+        (IP allowlists, SNI≠IP mismatch, hosting ASN, quotas).
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    <p>NetPath Lab · authorized ISP red-team training · hosted on GitHub Pages</p>
+    <p><a href="https://github.com/bbscalton/netpath-lab">Source on GitHub</a></p>
+  </footer>
+</body>
+</html>

@@ -16,6 +16,7 @@
     <a class="brand" href="index.html">NetPath Lab</a>
     <nav>
       <a href="#download">Download</a>
+      <a href="#import-configs">Import configs</a>
       <a href="methods.html">Methods</a>
       <a href="#guide">Guide</a>
       <a href="#stack">Custom Setup</a>
@@ -49,7 +50,30 @@
       </ol>
       <p class="note">Install only on devices you control. Sideloading is intentional for lab builds.</p>
       <a class="btn primary" href="downloads/netpath-lab.apk" download>netpath-lab.apk</a>
-      <a class="btn ghost" href="methods.html">Configure each method</a>
+      <a class="btn ghost" href="#import-configs">Import a drill config</a>
+    </section>
+
+    <section id="import-configs" class="panel warn">
+      <h2>Import configs (one-tap setup)</h2>
+      <p>
+        Download a pre-filled <code>.nplab.json</code> for each bypass method — no manual host/user/port entry.
+        Open the app → <strong>Import config</strong> → select the file → <strong>Connect</strong>.
+      </p>
+      <p class="note">
+        <strong>Security warning:</strong> configs contain live lab credentials. This site is a public GitHub repo.
+        Use only for authorized drills. <strong>Rotate the lab password after exercises.</strong>
+        Lab account expires <strong>13 Aug 2026</strong>.
+      </p>
+      <div class="cta">
+        <a class="btn primary" href="downloads/netpath-lab-configs.zip" download>Download all configs (zip)</a>
+        <a class="btn ghost" href="methods.html#import-configs">Per-method table + links</a>
+      </div>
+      <h3>Quick start</h3>
+      <ol class="steps">
+        <li>Download <a href="downloads/configs/01-sni-mismatch.nplab.json">01-sni-mismatch.nplab.json</a> (or any method below).</li>
+        <li>Install the APK → open NetPath Lab → tap <strong>Import config</strong>.</li>
+        <li>Select the downloaded file → tap <strong>Connect</strong> on pack SIM.</li>
+      </ol>
     </section>
 
     <section id="guide" class="panel">
@@ -142,7 +166,9 @@ Keep app / VPN alive</code></pre>
     </section>
 
     <section id="server" class="panel">
-      <h2>Lab server (your VPS)</h2>
+      <h2>Lab server (sshocean)</h2>
+      <p>Pre-filled in every import config. Host <code>fr1.sshweb.site</code> · SSH ports <code>22</code>/<code>80</code> · TLS <code>143</code>/<code>443</code> · account expires <strong>13 Aug 2026</strong>.</p>
+      <p>See <a href="https://github.com/bbscalton/netpath-lab/blob/main/docs/LAB_SERVER.md">LAB_SERVER.md</a> for port mapping and operator notes.</p>
       <pre class="code"><code>sudo apt update &amp;&amp; sudo apt install -y openssh-server
 sudo tee /etc/ssh/sshd_config.d/netpath-lab.conf &lt;&lt;'EOF'
 Port 443

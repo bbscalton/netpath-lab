@@ -16,6 +16,7 @@
     <a class="brand" href="index.html">NetPath Lab</a>
     <nav>
       <a href="index.html#download">Download</a>
+      <a href="#import-configs">Import configs</a>
       <a href="methods.html">Methods</a>
       <a href="index.html#stack">Custom Setup</a>
       <a href="index.html#server">Lab server</a>
@@ -52,6 +53,64 @@
       <p>Select method <em>26. Billing / zero-rate miss drill</em> to apply a SNI-mismatch baseline, then run any method 1–25 on pack SIM.</p>
       <h3>Defender fix</h3>
       <p>Destination IP/prefix allowlists on the pack bearer; SNI≠IP mismatch deny/rate; quotas + hosting-ASN scoring.</p>
+    </section>
+
+    <section id="import-configs" class="panel warn">
+      <h2>Import configs</h2>
+      <p>
+        Each row is a ready-to-import <code>.nplab.json</code> (TunnelProfile JSON).
+        Flow: <strong>download</strong> → open app → <strong>Import config</strong> → <strong>Connect</strong>.
+      </p>
+      <p class="note">
+        <strong>Security warning:</strong> files contain live username/password for the shared lab server.
+        This repository is public — <strong>rotate the password after drills</strong> and use only on authorized networks.
+        Lab account created 6 Aug 2026, expires <strong>13 Aug 2026</strong>.
+      </p>
+      <div class="cta">
+        <a class="btn primary" href="downloads/netpath-lab-configs.zip" download>Download all configs (zip)</a>
+        <a class="btn ghost" href="downloads/configs/manifest.json">manifest.json</a>
+      </div>
+      <div class="config-table-wrap">
+        <table class="config-table">
+          <thead>
+            <tr>
+              <th>Method</th>
+              <th>Config file</th>
+              <th>Port</th>
+              <th>Front mode</th>
+              <th>Import steps</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>1. SNI mismatch</td><td><a href="downloads/configs/01-sni-mismatch.nplab.json" download>01-sni-mismatch.nplab.json</a></td><td>443</td><td><code>TLS_SNI_CLIENTHELLO_ONLY</code></td><td>Import → Connect</td></tr>
+            <tr><td>2. Preserve SNI</td><td><a href="downloads/configs/02-preserve-sni.nplab.json" download>02-preserve-sni.nplab.json</a></td><td>443</td><td><code>TLS_SNI_CLIENTHELLO_ONLY</code></td><td>Import → Connect</td></tr>
+            <tr><td>3. Realm Host v2</td><td><a href="downloads/configs/03-realm-host-v2.nplab.json" download>03-realm-host-v2.nplab.json</a></td><td>443</td><td><code>TLS_SNI_CLIENTHELLO_ONLY</code></td><td>Import → Connect</td></tr>
+            <tr><td>4. Realm + Preserve</td><td><a href="downloads/configs/04-realm-preserve-sni.nplab.json" download>04-realm-preserve-sni.nplab.json</a></td><td>443</td><td><code>TLS_SNI_CLIENTHELLO_ONLY</code></td><td>Import → Connect</td></tr>
+            <tr><td>5. TCP Payload</td><td><a href="downloads/configs/05-tcp-payload-sni.nplab.json" download>05-tcp-payload-sni.nplab.json</a></td><td>443</td><td><code>TLS_SNI_CLIENTHELLO_ONLY</code></td><td>Import → Connect</td></tr>
+            <tr><td>6. HTTP inject</td><td><a href="downloads/configs/06-http-host-inject.nplab.json" download>06-http-host-inject.nplab.json</a></td><td>80</td><td><code>HTTP_INJECT</code></td><td>Import → Connect</td></tr>
+            <tr><td>7. SSH :443 direct</td><td><a href="downloads/configs/07-ssh-443-direct.nplab.json" download>07-ssh-443-direct.nplab.json</a></td><td>443</td><td><code>DIRECT</code></td><td>Import → Connect</td></tr>
+            <tr><td>8. Full TLS + SNI</td><td><a href="downloads/configs/08-tls-full-sni.nplab.json" download>08-tls-full-sni.nplab.json</a></td><td>443</td><td><code>TLS_SNI_FULL</code></td><td>Import → Connect (stunnel)</td></tr>
+            <tr><td>9. Port fallback</td><td><a href="downloads/configs/09-port-fallback-hold.nplab.json" download>09-port-fallback-hold.nplab.json</a></td><td>443→80→8080</td><td><code>TLS_SNI_CLIENTHELLO_ONLY</code></td><td>Import → Connect</td></tr>
+            <tr><td>10. www. SNI toggle</td><td><a href="downloads/configs/10-www-sni-toggle.nplab.json" download>10-www-sni-toggle.nplab.json</a></td><td>443</td><td><code>TLS_SNI_CLIENTHELLO_ONLY</code></td><td>Import → Connect</td></tr>
+            <tr><td>11. Full hold stack</td><td><a href="downloads/configs/11-custom-setup-hold.nplab.json" download>11-custom-setup-hold.nplab.json</a></td><td>443→80→8080</td><td><code>TLS_SNI_CLIENTHELLO_ONLY</code></td><td>Import → Connect</td></tr>
+            <tr><td>13. WebSocket + TLS</td><td><a href="downloads/configs/13-ws-tls-front.nplab.json" download>13-ws-tls-front.nplab.json</a></td><td>443</td><td><code>HTTP_WEBSOCKET_TLS</code></td><td>Import → Connect</td></tr>
+            <tr><td>14. HTTP/2 preface</td><td><a href="downloads/configs/14-http2-preamble-sni.nplab.json" download>14-http2-preamble-sni.nplab.json</a></td><td>443</td><td><code>HTTP2_PREAMBLE_TLS</code></td><td>Import → Connect</td></tr>
+            <tr><td>15. Chrome JA3 mimic</td><td><a href="downloads/configs/15-chrome-ja3-mimic.nplab.json" download>15-chrome-ja3-mimic.nplab.json</a></td><td>443</td><td><code>TLS_CHROME_JA3_MIMIC</code></td><td>Import → Connect</td></tr>
+            <tr><td>16. Trojan camouflage</td><td><a href="downloads/configs/16-trojan-http-camouflage.nplab.json" download>16-trojan-http-camouflage.nplab.json</a></td><td>443</td><td><code>TROJAN_HTTP_CAMOUFLAGE</code></td><td>Import → Connect</td></tr>
+            <tr><td>17. Random padding</td><td><a href="downloads/configs/17-random-padding-sni.nplab.json" download>17-random-padding-sni.nplab.json</a></td><td>443</td><td><code>TLS_SNI_CLIENTHELLO_ONLY</code></td><td>Import → Connect</td></tr>
+            <tr><td>18. Reality (doc)</td><td><a href="downloads/configs/18-doc-reality-xtls.nplab.json" download>18-doc-reality-xtls.nplab.json</a></td><td>443</td><td><code>TLS_CHROME_JA3_MIMIC</code></td><td>Import → separate Xray client</td></tr>
+            <tr><td>19. VMess/VLESS (doc)</td><td><a href="downloads/configs/19-doc-vmess-vless.nplab.json" download>19-doc-vmess-vless.nplab.json</a></td><td>443</td><td><code>HTTP_WEBSOCKET_TLS</code></td><td>Import → method 13 analogue</td></tr>
+            <tr><td>20. Shadowsocks (doc)</td><td><a href="downloads/configs/20-doc-shadowsocks.nplab.json" download>20-doc-shadowsocks.nplab.json</a></td><td>443</td><td><code>TLS_SNI_CLIENTHELLO_ONLY</code></td><td>Import → padding drill</td></tr>
+            <tr><td>21. Hysteria/QUIC (doc)</td><td><a href="downloads/configs/21-doc-hysteria-quic.nplab.json" download>21-doc-hysteria-quic.nplab.json</a></td><td>443 UDP</td><td><code>DIRECT</code></td><td>Drill-only; separate client</td></tr>
+            <tr><td>22. CDN fronting (doc)</td><td><a href="downloads/configs/22-doc-cdn-fronting.nplab.json" download>22-doc-cdn-fronting.nplab.json</a></td><td>443</td><td><code>TLS_SNI_FULL</code></td><td>Import → CDN lab setup</td></tr>
+            <tr><td>23. MUX (doc)</td><td><a href="downloads/configs/23-doc-mux-streams.nplab.json" download>23-doc-mux-streams.nplab.json</a></td><td>443</td><td><code>TLS_SNI_CLIENTHELLO_ONLY</code></td><td>Import → Connect</td></tr>
+            <tr><td>24. Encapsulated TLS (doc)</td><td><a href="downloads/configs/24-doc-encapsulated-tls.nplab.json" download>24-doc-encapsulated-tls.nplab.json</a></td><td>443</td><td><code>TLS_SNI_CLIENTHELLO_ONLY</code></td><td>Import → browse HTTPS via VPN</td></tr>
+            <tr><td>25. obfs4/DNSTT (doc)</td><td><a href="downloads/configs/25-doc-obfs4-dnstt.nplab.json" download>25-doc-obfs4-dnstt.nplab.json</a></td><td>53 UDP</td><td><code>DIRECT</code></td><td>Drill-only; separate client</td></tr>
+            <tr><td>26. Billing framing</td><td><a href="downloads/configs/26-billing-zero-rate-drill.nplab.json" download>26-billing-zero-rate-drill.nplab.json</a></td><td>443</td><td><code>TLS_SNI_CLIENTHELLO_ONLY</code></td><td>Import → score PASS/FAIL</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">Proxy ports <code>8080</code>, <code>3128</code>, <code>8888</code> are used when port-fallback retries (methods 9, 11). UDPGW <code>7200</code>/<code>7300</code> are documented for SOC drills only — app is TCP/SSH focused.</p>
     </section>
 
     <nav class="toc panel">

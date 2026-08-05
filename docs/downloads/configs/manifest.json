@@ -1,0 +1,261 @@
+{
+  "version": 1,
+  "labServer": {
+    "hostname": "fr1.sshweb.site",
+    "username": "sshocean-bbsharp",
+    "sshPorts": [
+      22,
+      80
+    ],
+    "sslTlsPorts": [
+      143,
+      443
+    ],
+    "proxyPorts": [
+      8080,
+      3128,
+      8888
+    ],
+    "udpgwPorts": [
+      7200,
+      7300
+    ],
+    "accountCreated": "2026-08-06",
+    "accountExpires": "2026-08-13",
+    "notes": "UDPGW ports are drill-only; NetPath Lab is TCP/SSH focused. Proxy ports used by port-fallback hold stack (443\u219280\u21928080)."
+  },
+  "securityWarning": "Configs contain live credentials. This is a public repo \u2014 rotate the lab password after drills. Authorized testing only.",
+  "importSteps": [
+    "Download a .nplab.json config from this site",
+    "Open NetPath Lab \u2192 Import config",
+    "Select the downloaded file",
+    "Tap Connect (grant VPN permission if prompted)"
+  ],
+  "configs": [
+    {
+      "methodId": "SNI_MISMATCH",
+      "methodNum": "01",
+      "title": "1. SNI mismatch / Custom SNI (ClientHello-only)",
+      "configFile": "configs/01-sni-mismatch.nplab.json",
+      "port": 443,
+      "frontMode": "TLS_SNI_CLIENTHELLO_ONLY",
+      "serverHost": "fr1.sshweb.site"
+    },
+    {
+      "methodId": "PRESERVE_SNI_ON",
+      "methodNum": "02",
+      "title": "2. Preserve SNI",
+      "configFile": "configs/02-preserve-sni.nplab.json",
+      "port": 443,
+      "frontMode": "TLS_SNI_CLIENTHELLO_ONLY",
+      "serverHost": "fr1.sshweb.site"
+    },
+    {
+      "methodId": "REALM_HOST_V2",
+      "methodNum": "03",
+      "title": "3. Realm Host v2",
+      "configFile": "configs/03-realm-host-v2.nplab.json",
+      "port": 443,
+      "frontMode": "TLS_SNI_CLIENTHELLO_ONLY",
+      "serverHost": "fr1.sshweb.site"
+    },
+    {
+      "methodId": "REALM_PLUS_PRESERVE",
+      "methodNum": "04",
+      "title": "4. Realm Host v2 + Preserve SNI",
+      "configFile": "configs/04-realm-preserve-sni.nplab.json",
+      "port": 443,
+      "frontMode": "TLS_SNI_CLIENTHELLO_ONLY",
+      "serverHost": "fr1.sshweb.site"
+    },
+    {
+      "methodId": "TCP_PAYLOAD_FRONT",
+      "methodNum": "05",
+      "title": "5. TCP Payload + Preserve SNI",
+      "configFile": "configs/05-tcp-payload-sni.nplab.json",
+      "port": 443,
+      "frontMode": "TLS_SNI_CLIENTHELLO_ONLY",
+      "serverHost": "fr1.sshweb.site"
+    },
+    {
+      "methodId": "HTTP_HOST_INJECT",
+      "methodNum": "06",
+      "title": "6. HTTP Host / CONNECT inject",
+      "configFile": "configs/06-http-host-inject.nplab.json",
+      "port": 80,
+      "frontMode": "HTTP_INJECT",
+      "serverHost": "fr1.sshweb.site"
+    },
+    {
+      "methodId": "SSH_ON_443_DIRECT",
+      "methodNum": "07",
+      "title": "7. SSH on 443 Direct (no inject)",
+      "configFile": "configs/07-ssh-443-direct.nplab.json",
+      "port": 443,
+      "frontMode": "DIRECT",
+      "serverHost": "fr1.sshweb.site"
+    },
+    {
+      "methodId": "TLS_FULL_SNI",
+      "methodNum": "08",
+      "title": "8. Full TLS wrap + Custom SNI (stunnel)",
+      "configFile": "configs/08-tls-full-sni.nplab.json",
+      "port": 443,
+      "frontMode": "TLS_SNI_FULL",
+      "serverHost": "fr1.sshweb.site"
+    },
+    {
+      "methodId": "PORT_FALLBACK_HOLD",
+      "methodNum": "09",
+      "title": "9. Port fallback hold stack (443\u219280\u21928080)",
+      "configFile": "configs/09-port-fallback-hold.nplab.json",
+      "port": 443,
+      "frontMode": "TLS_SNI_CLIENTHELLO_ONLY",
+      "serverHost": "fr1.sshweb.site"
+    },
+    {
+      "methodId": "WWW_SNI_TOGGLE",
+      "methodNum": "10",
+      "title": "10. www. SNI toggle",
+      "configFile": "configs/10-www-sni-toggle.nplab.json",
+      "port": 443,
+      "frontMode": "TLS_SNI_CLIENTHELLO_ONLY",
+      "serverHost": "fr1.sshweb.site"
+    },
+    {
+      "methodId": "CUSTOM_SETUP_HOLD",
+      "methodNum": "11",
+      "title": "11. Custom Setup full hold stack",
+      "configFile": "configs/11-custom-setup-hold.nplab.json",
+      "port": 443,
+      "frontMode": "TLS_SNI_CLIENTHELLO_ONLY",
+      "serverHost": "fr1.sshweb.site"
+    },
+    {
+      "methodId": "WS_TLS_FRONT",
+      "methodNum": "13",
+      "title": "13. WebSocket upgrade + TLS SNI",
+      "configFile": "configs/13-ws-tls-front.nplab.json",
+      "port": 443,
+      "frontMode": "HTTP_WEBSOCKET_TLS",
+      "serverHost": "fr1.sshweb.site"
+    },
+    {
+      "methodId": "HTTP2_PREAMBLE_SNI",
+      "methodNum": "14",
+      "title": "14. HTTP/2 preface + TLS SNI",
+      "configFile": "configs/14-http2-preamble-sni.nplab.json",
+      "port": 443,
+      "frontMode": "HTTP2_PREAMBLE_TLS",
+      "serverHost": "fr1.sshweb.site"
+    },
+    {
+      "methodId": "CHROME_JA3_MIMIC",
+      "methodNum": "15",
+      "title": "15. Chrome JA3/JA4 mimic ClientHello",
+      "configFile": "configs/15-chrome-ja3-mimic.nplab.json",
+      "port": 443,
+      "frontMode": "TLS_CHROME_JA3_MIMIC",
+      "serverHost": "fr1.sshweb.site"
+    },
+    {
+      "methodId": "TROJAN_HTTP_CAMOUFLAGE",
+      "methodNum": "16",
+      "title": "16. Trojan-style HTTP camouflage",
+      "configFile": "configs/16-trojan-http-camouflage.nplab.json",
+      "port": 443,
+      "frontMode": "TROJAN_HTTP_CAMOUFLAGE",
+      "serverHost": "fr1.sshweb.site"
+    },
+    {
+      "methodId": "RANDOM_PADDING_SNI",
+      "methodNum": "17",
+      "title": "17. Random padding + TLS SNI",
+      "configFile": "configs/17-random-padding-sni.nplab.json",
+      "port": 443,
+      "frontMode": "TLS_SNI_CLIENTHELLO_ONLY",
+      "serverHost": "fr1.sshweb.site"
+    },
+    {
+      "methodId": "DOC_REALITY_XTLS",
+      "methodNum": "18",
+      "title": "18. [SOC drill] XTLS-Reality / TLS hijack",
+      "configFile": "configs/18-doc-reality-xtls.nplab.json",
+      "port": 443,
+      "frontMode": "TLS_CHROME_JA3_MIMIC",
+      "serverHost": "fr1.sshweb.site"
+    },
+    {
+      "methodId": "DOC_VMESS_VLESS",
+      "methodNum": "19",
+      "title": "19. [SOC drill] VMess / VLESS + WebSocket + TLS",
+      "configFile": "configs/19-doc-vmess-vless.nplab.json",
+      "port": 443,
+      "frontMode": "HTTP_WEBSOCKET_TLS",
+      "serverHost": "fr1.sshweb.site"
+    },
+    {
+      "methodId": "DOC_SHADOWSOCKS",
+      "methodNum": "20",
+      "title": "20. [SOC drill] Shadowsocks / plugins obfuscation",
+      "configFile": "configs/20-doc-shadowsocks.nplab.json",
+      "port": 443,
+      "frontMode": "TLS_SNI_CLIENTHELLO_ONLY",
+      "serverHost": "fr1.sshweb.site"
+    },
+    {
+      "methodId": "DOC_HYSTERIA_QUIC",
+      "methodNum": "21",
+      "title": "21. [SOC drill] Hysteria / QUIC UDP tunnel",
+      "configFile": "configs/21-doc-hysteria-quic.nplab.json",
+      "port": 443,
+      "frontMode": "DIRECT",
+      "serverHost": "fr1.sshweb.site"
+    },
+    {
+      "methodId": "DOC_CDN_FRONTING",
+      "methodNum": "22",
+      "title": "22. [SOC drill] CDN domain fronting",
+      "configFile": "configs/22-doc-cdn-fronting.nplab.json",
+      "port": 443,
+      "frontMode": "TLS_SNI_FULL",
+      "serverHost": "fr1.sshweb.site"
+    },
+    {
+      "methodId": "DOC_MUX_STREAMS",
+      "methodNum": "23",
+      "title": "23. [SOC drill] Multiplexed streams (MUX)",
+      "configFile": "configs/23-doc-mux-streams.nplab.json",
+      "port": 443,
+      "frontMode": "TLS_SNI_CLIENTHELLO_ONLY",
+      "serverHost": "fr1.sshweb.site"
+    },
+    {
+      "methodId": "DOC_ENCAPSULATED_TLS",
+      "methodNum": "24",
+      "title": "24. [SOC drill] Encapsulated TLS-in-TLS fingerprint",
+      "configFile": "configs/24-doc-encapsulated-tls.nplab.json",
+      "port": 443,
+      "frontMode": "TLS_SNI_CLIENTHELLO_ONLY",
+      "serverHost": "fr1.sshweb.site"
+    },
+    {
+      "methodId": "DOC_OBFS4_DNSTT",
+      "methodNum": "25",
+      "title": "25. [SOC drill] obfs4 / DNSTT (HA Tunnel DNS mode)",
+      "configFile": "configs/25-doc-obfs4-dnstt.nplab.json",
+      "port": 53,
+      "frontMode": "DIRECT",
+      "serverHost": "fr1.sshweb.site"
+    },
+    {
+      "methodId": "BILLING_ZERO_RATE_DRILL",
+      "methodNum": "26",
+      "title": "26. Billing / zero-rate miss drill (framing)",
+      "configFile": "configs/26-billing-zero-rate-drill.nplab.json",
+      "port": 443,
+      "frontMode": "TLS_SNI_CLIENTHELLO_ONLY",
+      "serverHost": "fr1.sshweb.site"
+    }
+  ]
+}

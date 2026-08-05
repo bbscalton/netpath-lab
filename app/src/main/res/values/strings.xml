@@ -7,6 +7,8 @@
     <string name="disconnect">Disconnect</string>
     <string name="save_profile">Save profile</string>
     <string name="export_log">Export log + config</string>
+    <string name="import_config">Import config</string>
+    <string name="export_profile">Export profile (.nplab)</string>
     <string name="learn">Learn / SOC</string>
     <string name="scenarios">Bypass methods (select &amp; apply)</string>
     <string name="apply_method">Apply method to form</string>

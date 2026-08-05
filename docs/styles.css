@@ -221,6 +221,38 @@ ul strong { color: var(--text); }
 .adv:first-of-type { border-top: none; padding-top: 0; }
 .adv p { color: var(--muted); margin: 0.35rem 0; }
 
+.config-table-wrap {
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+.config-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+.config-table th,
+.config-table td {
+  border: 1px solid var(--line);
+  padding: 0.5rem 0.65rem;
+  text-align: left;
+  vertical-align: top;
+}
+.config-table th {
+  background: var(--surface);
+  color: var(--accent);
+  font-weight: 600;
+}
+.config-table td code {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+}
+.config-table a {
+  color: var(--accent);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.config-table a:hover { text-decoration: underline; }
+
 footer {
   width: min(880px, calc(100% - 2rem));
   margin: 0 auto 2rem;

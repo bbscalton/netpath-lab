@@ -32,6 +32,9 @@ import com.netpath.lab.vpn.TunnelVpnService
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -52,6 +55,49 @@ class MainActivity : AppCompatActivity() {
     private val notifPermission = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { /* continue regardless */ }
+
+    private val importConfig = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri == null) return@registerForActivityResult
+        runCatching {
+            contentResolver.takePersistableUriPermission(
+                uri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION
+            )
+        }
+        runCatching {
+            val json = contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
+                ?: throw IllegalArgumentException("Empty file")
+            val profile = NetPathApp.instance.profileStore.importJson(json)
+            if (profile.serverHost.isBlank()) {
+                throw IllegalArgumentException("Missing serverHost in config")
+            }
+            NetPathApp.instance.profileStore.save(profile)
+            bindProfile(profile)
+            SessionLog.append("Imported profile: ${profile.name}")
+            Toast.makeText(this, "Imported: ${profile.name}", Toast.LENGTH_SHORT).show()
+        }.onFailure { e ->
+            Toast.makeText(this, "Import failed: ${e.message}", Toast.LENGTH_LONG).show()
+            SessionLog.append("Import failed: ${e.message}")
+        }
+    }
+
+    private val exportProfile = registerForActivityResult(
+        ActivityResultContracts.CreateDocument("application/json")
+    ) { uri ->
+        if (uri == null) return@registerForActivityResult
+        val profile = readProfileFromForm()
+        runCatching {
+            contentResolver.openOutputStream(uri)?.use { out ->
+                out.write(NetPathApp.instance.profileStore.exportJson(profile).toByteArray())
+            }
+            Toast.makeText(this, "Profile exported", Toast.LENGTH_SHORT).show()
+            SessionLog.append("Exported profile: ${profile.name}")
+        }.onFailure { e ->
+            Toast.makeText(this, "Export failed: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -159,6 +205,21 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btnExport.setOnClickListener { exportSessionBundle() }
+
+        binding.btnImportConfig.setOnClickListener {
+            importConfig.launch(arrayOf("application/json", "text/plain", "*/*"))
+        }
+
+        binding.btnExportProfile.setOnClickListener {
+            val profile = readProfileFromForm()
+            val stamp = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(Date())
+            val safeName = profile.name
+                .lowercase(Locale.US)
+                .replace(Regex("[^a-z0-9]+"), "-")
+                .trim('-')
+                .ifBlank { "lab-profile" }
+            exportProfile.launch("$safeName-$stamp.nplab.json")
+        }
 
         lifecycleScope.launch {
             SessionLog.text.collectLatest { binding.logView.text = it }

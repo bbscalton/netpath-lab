@@ -71,7 +71,7 @@
       </div>
       <h3>Quick start</h3>
       <ol class="steps">
-        <li>Download <a href="downloads/configs/01-sni-mismatch.nplab.json">01-sni-mismatch.nplab.json</a> (or any method below).</li>
+        <li>Download <a href="downloads/configs/00-ssh-direct-22.nplab.json">00-ssh-direct-22.nplab.json</a> (SSH baseline on :22) or <a href="downloads/configs/06-http-host-inject.nplab.json">06-http-host-inject.nplab.json</a> (probe-verified hold path on :80).</li>
         <li>Install the APK → open NetPath Lab → tap <strong>Import config</strong>.</li>
         <li>Select the downloaded file → tap <strong>Connect</strong> on pack SIM.</li>
       </ol>
@@ -103,6 +103,7 @@
       <h2>Bypass methods (in app + docs)</h2>
       <p>Each entry is selectable in the app <strong>Bypass methods</strong> spinner and fully documented on the methods page.</p>
       <ol class="method-index">
+        <li><a href="methods.html#import-configs">SSH on 22 Direct (baseline)</a></li>
         <li><a href="methods.html#m1">SNI mismatch / Custom SNI (ClientHello-only)</a></li>
         <li><a href="methods.html#m2">Preserve SNI</a></li>
         <li><a href="methods.html#m3">Realm Host v2</a></li>

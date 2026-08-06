@@ -33,6 +33,15 @@
   ],
   "configs": [
     {
+      "methodId": "SSH_DIRECT_22",
+      "methodNum": "00",
+      "title": "0. SSH on 22 Direct (baseline)",
+      "configFile": "configs/00-ssh-direct-22.nplab.json",
+      "port": 22,
+      "frontMode": "DIRECT",
+      "serverHost": "fr1.sshweb.site"
+    },
+    {
       "methodId": "SNI_MISMATCH",
       "methodNum": "01",
       "title": "1. SNI mismatch / Custom SNI (ClientHello-only)",

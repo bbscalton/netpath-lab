@@ -21,13 +21,27 @@ Use a server you control for authorized drills. The bundled **sshocean** lab acc
 
 | Port | Typical use in NetPath Lab |
 |------|----------------------------|
+| `22` | Raw SSH direct baseline (method 0); OpenSSH banner probe target |
 | `443` | SNI mismatch, TLS fronts, WS/h2/Trojan/JA3 drills (methods 1–5, 7–11, 13–17, 18–24, 26) |
-| `80` | HTTP CONNECT inject (method 6); port-fallback retry |
-| `22` | Raw SSH direct (no TLS front) |
-| `143` | SSL/TLS alt port (same ClientHello-only drills as 443) |
-| `8080` | Port-fallback hold stack retry (method 9, 11) |
+| `80` | HTTP CONNECT inject (method 6); port-fallback retry — **probe-verified AUTH_OK on sshocean** |
+| `143` | SSL/TLS alt port — **refused from probe network** (not usable without operator fix) |
+| `8080` | Port-fallback hold stack retry (method 9, 11) — **timeout/refused from probe** |
 | `53` | Doc-only DNSTT drill (method 25 — separate client) |
 | `7200`/`7300` | UDPGW — document in SOC tickets; not wired in app |
+
+## Probe findings (Aug 2026, `fr1.sshweb.site`)
+
+Desktop probe run (`tools/netpath-probe/reports/latest.html`, 2026-08-06):
+
+| Port | Probe result | Interpretation |
+|------|--------------|----------------|
+| **22** | OK — `SSH-2.0-OpenSSH_9.9` (~396 ms) | **Baseline** — real OpenSSH; use method **00** for control tests |
+| **80** | OK + **AUTH_OK** on method 6 (~1553 ms) | **Only working hold path** — dropbear SSH behind HTTP inject; use method **06** on pack SIM |
+| **443** | TCP OK but all TLS/SNI fronts → `FRONT_SENT` | **TLS terminator, not SSH-after-ClientHello** — binary garbage after fake ClientHello; methods 1–5, 7, 13–17 fail probe |
+| **143** | Connection refused | Not listening from probe network — do not use until operator opens port |
+| **8080** | Timeout / refused (methods 9, 11, 26) | Port-fallback retry path **not usable** on this lab host from probe |
+
+**Recommended import order for pack drills:** `00-ssh-direct-22` (baseline on paid/Wi‑Fi) → `06-http-host-inject` (verified hold on :80) → then SNI/TLS methods on :443 for FAIL demonstrations.
 
 ## Import flow (no manual entry)
 

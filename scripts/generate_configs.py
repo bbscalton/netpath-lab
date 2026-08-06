@@ -45,6 +45,21 @@ def base(**kwargs):
 
 SCENARIOS = [
     {
+        "num": "00",
+        "slug": "ssh-direct-22",
+        "id": "SSH_DIRECT_22",
+        "title": "0. SSH on 22 Direct (baseline)",
+        "port": 22,
+        "front": "DIRECT",
+        "profile": lambda: base(
+            name="00-ssh-direct-22",
+            serverPort=22,
+            frontMode="DIRECT",
+            preserveSni=False,
+            portFallback=False,
+        ),
+    },
+    {
         "num": "01",
         "slug": "sni-mismatch",
         "id": "SNI_MISMATCH",
@@ -385,42 +400,6 @@ SCENARIOS = [
         ),
     },
 ]
-
-# Bonus: SSH direct on port 22 and SSL alt on 143 for lab server port coverage
-BONUS = [
-    {
-        "num": "07b",
-        "slug": "ssh-22-direct",
-        "id": "SSH_ON_22_DIRECT",
-        "title": "7b. SSH on 22 Direct (lab server alt port)",
-        "port": 22,
-        "front": "DIRECT",
-        "profile": lambda: base(
-            name="07b-ssh-22-direct",
-            serverPort=22,
-            frontMode="DIRECT",
-            preserveSni=False,
-            portFallback=False,
-        ),
-    },
-    {
-        "num": "08b",
-        "slug": "sni-mismatch-143",
-        "id": "SNI_MISMATCH_143",
-        "title": "8b. SNI mismatch on SSL alt port 143",
-        "port": 143,
-        "front": "TLS_SNI_CLIENTHELLO_ONLY",
-        "profile": lambda: base(
-            name="08b-sni-mismatch-143",
-            serverPort=143,
-            frontMode="TLS_SNI_CLIENTHELLO_ONLY",
-            customSni="www.example.com",
-            preserveSni=True,
-            portFallback=False,
-        ),
-    },
-]
-
 
 def main():
     os.makedirs(OUT_DIR, exist_ok=True)

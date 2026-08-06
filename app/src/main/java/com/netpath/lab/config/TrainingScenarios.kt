@@ -22,6 +22,32 @@ object TrainingScenarios {
 
     val all: List<Scenario> = listOf(
         Scenario(
+            id = "SSH_DIRECT_22",
+            title = "0. SSH on 22 Direct (baseline)",
+            description = "Raw SSH to lab host:22 with no HTTP/TLS inject — OpenSSH baseline before any hold-stack fronts.",
+            defenderHint = "$PASS_FAIL_FRAMING SSH on :22 to hosting ASN is trivially visible; pack should rate or block off-list dest IPs.",
+            steps = listOf(
+                "Host = fr1.sshweb.site (or your VPS); Port = 22.",
+                "Front = Direct (no SNI front).",
+                "All inject toggles OFF; port fallback OFF.",
+                "Probe baseline: expect OpenSSH banner (e.g. SSH-2.0-OpenSSH_9.9).",
+                "On pack: compare charging to method 6 (HTTP inject on :80) and method 1 (SNI on :443)."
+            ),
+            apply = { p ->
+                p.copy(
+                    customSetup = true,
+                    frontMode = FrontMode.DIRECT,
+                    preserveSni = false,
+                    useRealmHostV2 = false,
+                    useTcpPayload = false,
+                    wwwSniToggle = false,
+                    portFallback = false,
+                    serverPort = 22,
+                    transportProtocol = TransportProtocol.TCP
+                )
+            }
+        ),
+        Scenario(
             id = "SNI_MISMATCH",
             title = "1. SNI mismatch / Custom SNI (ClientHello-only)",
             description = "Dial your lab VPS IP on :443 but put a pack-like hostname in the TLS ClientHello SNI. " +
